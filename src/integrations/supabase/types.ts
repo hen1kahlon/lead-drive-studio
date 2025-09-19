@@ -14,16 +14,374 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_read: boolean | null
+          message: string | null
+          name: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          name: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
+      instructors: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          hourly_rate: number | null
+          id: string
+          is_active: boolean | null
+          license_number: string
+          specializations: Database["public"]["Enums"]["lesson_type"][] | null
+          updated_at: string
+          user_id: string
+          years_of_experience: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          hourly_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          license_number: string
+          specializations?: Database["public"]["Enums"]["lesson_type"][] | null
+          updated_at?: string
+          user_id: string
+          years_of_experience?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          hourly_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          license_number?: string
+          specializations?: Database["public"]["Enums"]["lesson_type"][] | null
+          updated_at?: string
+          user_id?: string
+          years_of_experience?: number | null
+        }
+        Relationships: []
+      }
+      lessons: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          instructor_id: string
+          instructor_notes: string | null
+          lesson_type: Database["public"]["Enums"]["lesson_type"]
+          notes: string | null
+          pickup_location: string | null
+          price: number | null
+          scheduled_date: string
+          status: Database["public"]["Enums"]["lesson_status"]
+          student_id: string
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          instructor_id: string
+          instructor_notes?: string | null
+          lesson_type?: Database["public"]["Enums"]["lesson_type"]
+          notes?: string | null
+          pickup_location?: string | null
+          price?: number | null
+          scheduled_date: string
+          status?: Database["public"]["Enums"]["lesson_status"]
+          student_id: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          instructor_id?: string
+          instructor_notes?: string | null
+          lesson_type?: Database["public"]["Enums"]["lesson_type"]
+          notes?: string | null
+          pickup_location?: string | null
+          price?: number | null
+          scheduled_date?: string
+          status?: Database["public"]["Enums"]["lesson_status"]
+          student_id?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          date_of_birth: string | null
+          first_name: string
+          id: string
+          last_name: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          instructor_id: string
+          is_public: boolean | null
+          lesson_id: string | null
+          rating: number
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          instructor_id: string
+          is_public?: boolean | null
+          lesson_id?: string | null
+          rating: number
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          instructor_id?: string
+          is_public?: boolean | null
+          lesson_id?: string | null
+          rating?: number
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          current_instructor_id: string | null
+          id: string
+          notes: string | null
+          practical_test_passed: boolean | null
+          theory_test_passed: boolean | null
+          total_lessons: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_instructor_id?: string | null
+          id?: string
+          notes?: string | null
+          practical_test_passed?: boolean | null
+          theory_test_passed?: boolean | null
+          total_lessons?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_instructor_id?: string | null
+          id?: string
+          notes?: string | null
+          practical_test_passed?: boolean | null
+          theory_test_passed?: boolean | null
+          total_lessons?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_current_instructor_id_fkey"
+            columns: ["current_instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_maintenance: string | null
+          license_plate: string
+          make: string
+          model: string
+          notes: string | null
+          updated_at: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_maintenance?: string | null
+          license_plate: string
+          make: string
+          model: string
+          notes?: string | null
+          updated_at?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"]
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_maintenance?: string | null
+          license_plate?: string
+          make?: string
+          model?: string
+          notes?: string | null
+          updated_at?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"]
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "instructor" | "student" | "user"
+      lesson_status: "scheduled" | "completed" | "cancelled" | "no_show"
+      lesson_type: "theory" | "practical" | "test_preparation" | "mock_test"
+      vehicle_type: "manual" | "automatic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +508,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "instructor", "student", "user"],
+      lesson_status: ["scheduled", "completed", "cancelled", "no_show"],
+      lesson_type: ["theory", "practical", "test_preparation", "mock_test"],
+      vehicle_type: ["manual", "automatic"],
+    },
   },
 } as const
