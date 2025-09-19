@@ -157,6 +157,7 @@
   );
   animation: drive-forward 3s ease-in-out infinite alternate;
   z-index: 1;
+  pointer-events: none;
 }
 
 .road-animation {
@@ -172,6 +173,7 @@
   );
   animation: road-lines 2s linear infinite;
   opacity: 0.3;
+  pointer-events: none;
 }
 
 /* Mobile Optimizations */

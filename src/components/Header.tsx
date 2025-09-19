@@ -94,10 +94,12 @@ const Header = () => {
               variant="ghost" 
               size="sm" 
               className="text-primary-foreground hover:bg-primary-light"
-              onClick={() => window.location.href = 'tel:0503250150'}
+              asChild
             >
-              <Phone className="h-4 w-4 mr-2" />
-              0503250150
+              <a href="tel:0503250150" aria-label="התקשר עכשיו">
+                <Phone className="h-4 w-4 mr-2" />
+                0503250150
+              </a>
             </Button>
             
             {/* Social Media Icons */}
@@ -230,10 +232,12 @@ const Header = () => {
                 variant="ghost" 
                 size="sm" 
                 className="text-primary-foreground hover:bg-primary-light justify-start w-full"
-                onClick={() => window.location.href = 'tel:0503250150'}
+                asChild
               >
-                <Phone className="h-4 w-4 mr-2" />
-                0503250150
+                <a href="tel:0503250150" aria-label="התקשר עכשיו">
+                  <Phone className="h-4 w-4 mr-2" />
+                  0503250150
+                </a>
               </Button>
               <Button 
                 variant="ghost" 

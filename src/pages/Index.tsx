@@ -76,7 +76,7 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative bg-primary overflow-hidden driving-background">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <img 
             src={steeringWheelImage} 
             alt="נוף מתוך הרכב - הגה ודרך"
@@ -110,11 +110,13 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="success"
+                asChild
                 className="text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
-                onClick={() => window.location.href = 'tel:0503250150'}
               >
-                <Phone className="w-5 h-5 mr-2" />
-                התקשר עכשיו
+                <a href="tel:0503250150" aria-label="התקשר עכשיו">
+                  <Phone className="w-5 h-5 mr-2" />
+                  התקשר עכשיו
+                </a>
               </Button>
               <Button 
                 size="lg" 
