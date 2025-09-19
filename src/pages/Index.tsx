@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Music, Facebook, Star, Car, Users, Award, Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { MessageCircle, Music, Facebook, Instagram, Mail, Star, Car, Users, Award, Phone, MapPin, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
 import dashboardImage from '@/assets/dashboard.jpg';
@@ -106,31 +106,17 @@ const Index = () => {
                 מאות תלמידים
               </Badge>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Button 
-                size="lg" 
-                variant="success"
-                asChild
-                className="text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
-              >
-                <a href="tel:0503250150" aria-label="התקשר עכשיו">
-                  <Phone className="w-5 h-5 mr-2" />
-                  התקשר עכשיו
-                </a>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="secondary" 
-                className="text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
-                onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
-              >
-                <Mail className="w-5 h-5 mr-2" />
-                שלח מייל
-              </Button>
-            </div>
-            
             {/* Social Media Icons */}
             <div className="flex justify-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
+                aria-label="Gmail"
+              >
+                <Mail className="h-6 w-6" />
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -157,6 +143,15 @@ const Index = () => {
                 aria-label="פייסבוק"
               >
                 <Facebook className="h-6 w-6" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                onClick={() => window.open('https://instagram.com/hen_kahlon', '_blank')}
+                aria-label="אינסטגרם"
+              >
+                <Instagram className="h-6 w-6" />
               </Button>
             </div>
           </div>
