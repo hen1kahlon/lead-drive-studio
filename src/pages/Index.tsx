@@ -109,8 +109,8 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="bg-accent hover:bg-accent-light text-accent-foreground text-lg px-8 py-4 flex-1 sm:flex-initial"
-                onClick={() => window.open('tel:0503250150', '_self')}
+                className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
+                onClick={() => window.location.href = 'tel:0503250150'}
               >
                 <Phone className="w-5 h-5 mr-2" />
                 התקשר עכשיו
@@ -118,8 +118,8 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-4 flex-1 sm:flex-initial"
-                onClick={() => window.open('mailto:hen1kahlon@gmail.com', '_self')}
+                className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
+                onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
               >
                 <Mail className="w-5 h-5 mr-2" />
                 שלח מייל
@@ -260,6 +260,11 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Profile Section */}
+      <ProfileSection />
+
+      <Separator />
+
       {/* Contact Section */}
       <section id="contact" className="py-16">
         <div className="container mx-auto px-4">
@@ -319,11 +324,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      <Separator />
-
-      {/* Profile Section */}
-      <ProfileSection />
 
       <Separator />
 

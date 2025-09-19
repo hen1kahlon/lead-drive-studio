@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { Lead, Review } from '../types';
-import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera } from 'lucide-react';
+import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera, Music } from 'lucide-react';
 import Header from '../components/Header';
 import * as XLSX from 'xlsx';
 
@@ -227,26 +227,26 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="leads" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
-            <TabsTrigger value="leads" className="flex items-center gap-1 sm:gap-2">
-              <Users className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">לידים</span>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto p-1">
+            <TabsTrigger value="leads" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Users className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">לידים</span>
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex items-center gap-1 sm:gap-2">
-              <MessageSquare className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">ביקורות</span>
+            <TabsTrigger value="reviews" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              <MessageSquare className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">ביקורות</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-1 sm:gap-2">
-              <User className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">פרופיל</span>
+            <TabsTrigger value="profile" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-success data-[state=active]:text-success-foreground">
+              <User className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">פרופיל</span>
             </TabsTrigger>
-            <TabsTrigger value="social" className="flex items-center gap-1 sm:gap-2">
-              <Facebook className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">רשתות</span>
+            <TabsTrigger value="social" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
+              <Facebook className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">רשתות</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-1 sm:gap-2">
-              <Settings className="w-4 h-4" />
-              <span className="text-xs sm:text-sm">אבטחה</span>
+            <TabsTrigger value="settings" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-warning data-[state=active]:text-warning-foreground">
+              <Shield className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">אבטחה</span>
             </TabsTrigger>
           </TabsList>
 
@@ -529,7 +529,7 @@ const AdminDashboard = () => {
                   
                   <div className="space-y-2">
                     <Label htmlFor="tiktok" className="flex items-center gap-2">
-                      <MessageCircle className="w-4 h-4" />
+                      <Music className="w-4 h-4" />
                       טיקטוק
                     </Label>
                     <Input

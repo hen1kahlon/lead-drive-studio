@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Car, LogOut, Settings, Menu, Phone, Mail, Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { Car, LogOut, Settings, Menu, Phone, Mail, Facebook, Instagram, MessageCircle, Music } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -94,7 +94,7 @@ const Header = () => {
               variant="ghost" 
               size="sm" 
               className="text-primary-foreground hover:bg-primary-light"
-              onClick={() => window.open('tel:0503250150', '_self')}
+              onClick={() => window.location.href = 'tel:0503250150'}
             >
               <Phone className="h-4 w-4 mr-2" />
               0503250150
@@ -120,6 +120,16 @@ const Header = () => {
                   onClick={() => window.open(socialMedia.instagram, '_blank')}
                 >
                   <Instagram className="h-4 w-4" />
+                </Button>
+              )}
+              {socialMedia.tiktok && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  onClick={() => window.open(socialMedia.tiktok, '_blank')}
+                >
+                  <Music className="h-4 w-4" />
                 </Button>
               )}
               {socialMedia.whatsapp && (
@@ -220,7 +230,7 @@ const Header = () => {
                 variant="ghost" 
                 size="sm" 
                 className="text-primary-foreground hover:bg-primary-light justify-start w-full"
-                onClick={() => window.open('tel:0503250150', '_self')}
+                onClick={() => window.location.href = 'tel:0503250150'}
               >
                 <Phone className="h-4 w-4 mr-2" />
                 0503250150
@@ -229,7 +239,7 @@ const Header = () => {
                 variant="ghost" 
                 size="sm" 
                 className="text-primary-foreground hover:bg-primary-light justify-start w-full"
-                onClick={() => window.open('mailto:hen1kahlon@gmail.com', '_self')}  
+                onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}  
               >
                 <Mail className="h-4 w-4 mr-2" />
                 אימייל
