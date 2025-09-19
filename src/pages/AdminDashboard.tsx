@@ -7,9 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../hooks/use-toast';
 import { Lead, Review } from '../types';
-import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key } from 'lucide-react';
+import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera } from 'lucide-react';
 import Header from '../components/Header';
 import * as XLSX from 'xlsx';
 
@@ -20,13 +22,21 @@ interface SocialMedia {
   whatsapp?: string;
 }
 
+interface ProfileData {
+  image?: string;
+  description?: string;
+}
+
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [socialMedia, setSocialMedia] = useState<SocialMedia>({});
   const [tempSocialMedia, setTempSocialMedia] = useState<SocialMedia>({});
+  const [profileData, setProfileData] = useState<ProfileData>({});
+  const [tempProfileData, setTempProfileData] = useState<ProfileData>({});
 
   useEffect(() => {
     if (!isAdmin) {
@@ -39,6 +49,7 @@ const AdminDashboard = () => {
     const savedLeads = localStorage.getItem('leads');
     const savedReviews = localStorage.getItem('reviews');
     const savedSocialMedia = localStorage.getItem('socialMedia');
+    const savedProfile = localStorage.getItem('profileData');
     
     if (savedLeads) {
       setLeads(JSON.parse(savedLeads).map((lead: any) => ({
@@ -56,6 +67,11 @@ const AdminDashboard = () => {
       const parsed = JSON.parse(savedSocialMedia);
       setSocialMedia(parsed);
       setTempSocialMedia(parsed);
+    }
+    if (savedProfile) {
+      const parsed = JSON.parse(savedProfile);
+      setProfileData(parsed);
+      setTempProfileData(parsed);
     }
   }, []);
 
@@ -105,6 +121,39 @@ const AdminDashboard = () => {
     localStorage.setItem('socialMedia', JSON.stringify(tempSocialMedia));
     // Trigger header refresh by dispatching a custom event
     window.dispatchEvent(new CustomEvent('socialMediaUpdated'));
+    
+    toast({
+      title: 'נשמר בהצלחה!',
+      description: 'הגדרות הרשתות החברתיות עודכנו',
+      variant: 'default'
+    });
+  };
+
+  const saveProfileData = () => {
+    setProfileData(tempProfileData);
+    localStorage.setItem('profileData', JSON.stringify(tempProfileData));
+    // Trigger profile update event
+    window.dispatchEvent(new CustomEvent('profileUpdated'));
+    
+    toast({
+      title: 'נשמר בהצלחה!',
+      description: 'פרטי הפרופיל עודכנו',
+      variant: 'default'
+    });
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTempProfileData({
+          ...tempProfileData,
+          image: reader.result as string
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const renderStars = (rating: number) => {
@@ -128,12 +177,12 @@ const AdminDashboard = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">דשבורד ניהול</h1>
-          <p className="text-xl text-muted-foreground">ניהול לידים, ביקורות והגדרות האתר</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">דשבורד ניהול</h1>
+          <p className="text-lg md:text-xl text-muted-foreground">ניהול לידים, ביקורות והגדרות האתר</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           <Card className="shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -178,22 +227,26 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="leads" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="leads" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+            <TabsTrigger value="leads" className="flex items-center gap-1 sm:gap-2">
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">לידים</span>
+              <span className="text-xs sm:text-sm">לידים</span>
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex items-center gap-2">
+            <TabsTrigger value="reviews" className="flex items-center gap-1 sm:gap-2">
               <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">ביקורות</span>
+              <span className="text-xs sm:text-sm">ביקורות</span>
             </TabsTrigger>
-            <TabsTrigger value="social" className="flex items-center gap-2">
+            <TabsTrigger value="profile" className="flex items-center gap-1 sm:gap-2">
+              <User className="w-4 h-4" />
+              <span className="text-xs sm:text-sm">פרופיל</span>
+            </TabsTrigger>
+            <TabsTrigger value="social" className="flex items-center gap-1 sm:gap-2">
               <Facebook className="w-4 h-4" />
-              <span className="hidden sm:inline">רשתות</span>
+              <span className="text-xs sm:text-sm">רשתות</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger value="settings" className="flex items-center gap-1 sm:gap-2">
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">אבטחה</span>
+              <span className="text-xs sm:text-sm">אבטחה</span>
             </TabsTrigger>
           </TabsList>
 
@@ -344,6 +397,95 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="profile">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  פרופיל אישי
+                </CardTitle>
+                <CardDescription>
+                  הוסף תמונת פרופיל ותיאור אישי שיוצגו באתר
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-6">
+                  <div className="space-y-4">
+                    <Label className="flex items-center gap-2">
+                      <Camera className="w-4 h-4" />
+                      תמונת פרופיל
+                    </Label>
+                    <div className="flex flex-col items-center gap-4">
+                      {tempProfileData.image ? (
+                        <div className="relative">
+                          <img 
+                            src={tempProfileData.image} 
+                            alt="תמונת פרופיל"
+                            className="w-32 h-32 rounded-full object-cover border-4 border-primary"
+                          />
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 w-8 h-8 rounded-full p-0"
+                            onClick={() => setTempProfileData({...tempProfileData, image: undefined})}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="w-32 h-32 rounded-full bg-muted border-2 border-dashed border-muted-foreground flex items-center justify-center">
+                          <Camera className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="flex flex-col items-center gap-2 w-full">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="profile-image"
+                        />
+                        <Button 
+                          variant="outline" 
+                          onClick={() => document.getElementById('profile-image')?.click()}
+                          className="flex items-center gap-2 w-full sm:w-auto"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {tempProfileData.image ? 'שנה תמונה' : 'העלה תמונה'}
+                        </Button>
+                        <p className="text-sm text-muted-foreground text-center">
+                          מומלץ: תמונה בגודל 400x400 פיקסלים
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description">
+                      תיאור אישי
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="כתוב כאן על עצמך כמורה נהיגה ומשכיר רכבי הוראה..."
+                      value={tempProfileData.description || ''}
+                      onChange={(e) => setTempProfileData({...tempProfileData, description: e.target.value})}
+                      rows={4}
+                      className="resize-none"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      התיאור יוצג באתר לצד תמונת הפרופיל
+                    </p>
+                  </div>
+                </div>
+                
+                <Button onClick={saveProfileData} className="flex items-center gap-2 w-full sm:w-auto">
+                  <Save className="w-4 h-4" />
+                  שמור פרופיל
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="social">
             <Card className="shadow-lg">
               <CardHeader>
@@ -414,7 +556,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 
-                <Button onClick={saveSocialMedia} className="flex items-center gap-2">
+                <Button onClick={saveSocialMedia} className="flex items-center gap-2 w-full sm:w-auto">
                   <Save className="w-4 h-4" />
                   שמור שינויים
                 </Button>

@@ -11,6 +11,7 @@ import dashboardImage from '@/assets/dashboard.jpg';
 import LeadForm from '../components/LeadForm';
 import ReviewForm from '../components/ReviewForm';
 import ReviewsList from '../components/ReviewsList';
+import ProfileSection from '../components/ProfileSection';
 import Header from '../components/Header';
 import { Lead, Review } from '../types';
 
@@ -318,6 +319,11 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <Separator />
+
+      {/* Profile Section */}
+      <ProfileSection />
 
       <Separator />
 
