@@ -77,14 +77,6 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-primary-foreground hover:bg-primary-light"
-            >
-              צור קשר
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
               onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-primary-foreground hover:bg-primary-light"
             >
@@ -108,40 +100,40 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.facebook, '_blank')}
                 >
-                  <Facebook className="h-4 w-4" />
+                  <Facebook className="h-4 w-4" style={{ color: '#1877F2' }} />
                 </Button>
               )}
               {socialMedia.instagram && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.instagram, '_blank')}
                 >
-                  <Instagram className="h-4 w-4" />
+                  <Instagram className="h-4 w-4" style={{ color: '#E4405F' }} />
                 </Button>
               )}
               {socialMedia.tiktok && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.tiktok, '_blank')}
                 >
-                  <Music className="h-4 w-4" />
+                  <Music className="h-4 w-4" style={{ color: '#000000' }} />
                 </Button>
               )}
               {socialMedia.whatsapp && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.whatsapp, '_blank')}
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-4 w-4" style={{ color: '#25D366' }} />
                 </Button>
               )}
             </div>
@@ -205,17 +197,6 @@ const Header = () => {
                 className="text-primary-foreground hover:bg-primary-light justify-start"
               >
                 השירותים
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => {
-                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                  setIsMobileMenuOpen(false);
-                }}
-                className="text-primary-foreground hover:bg-primary-light justify-start"
-              >
-                צור קשר
               </Button>
               <Button 
                 variant="ghost" 
