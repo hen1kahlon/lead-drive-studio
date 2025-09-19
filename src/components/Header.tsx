@@ -1,13 +1,39 @@
 import { Button } from '@/components/ui/button';
-import { Car, LogOut, Settings, Menu, Phone, Mail } from 'lucide-react';
+import { Car, LogOut, Settings, Menu, Phone, Mail, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+interface SocialMedia {
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  whatsapp?: string;
+}
 
 const Header = () => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [socialMedia, setSocialMedia] = useState<SocialMedia>({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem('socialMedia');
+    if (saved) {
+      setSocialMedia(JSON.parse(saved));
+    }
+
+    // Listen for social media updates
+    const handleSocialMediaUpdate = () => {
+      const updated = localStorage.getItem('socialMedia');
+      if (updated) {
+        setSocialMedia(JSON.parse(updated));
+      }
+    };
+
+    window.addEventListener('socialMediaUpdated', handleSocialMediaUpdate);
+    return () => window.removeEventListener('socialMediaUpdated', handleSocialMediaUpdate);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -64,12 +90,49 @@ const Header = () => {
             >
               ביקורות
             </Button>
-            <a href="tel:0503250150" className="flex items-center">
-              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-light">
-                <Phone className="h-4 w-4 mr-2" />
-                0503250150
-              </Button>
-            </a>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-primary-foreground hover:bg-primary-light"
+              onClick={() => window.open('tel:0503250150', '_self')}
+            >
+              <Phone className="h-4 w-4 mr-2" />
+              0503250150
+            </Button>
+            
+            {/* Social Media Icons */}
+            <div className="flex items-center space-x-2">
+              {socialMedia.facebook && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  onClick={() => window.open(socialMedia.facebook, '_blank')}
+                >
+                  <Facebook className="h-4 w-4" />
+                </Button>
+              )}
+              {socialMedia.instagram && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  onClick={() => window.open(socialMedia.instagram, '_blank')}
+                >
+                  <Instagram className="h-4 w-4" />
+                </Button>
+              )}
+              {socialMedia.whatsapp && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-light p-2"
+                  onClick={() => window.open(socialMedia.whatsapp, '_blank')}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             {isAdmin ? (
               <>
                 <Button 
@@ -153,18 +216,24 @@ const Header = () => {
               >
                 ביקורות
               </Button>
-              <a href="tel:0503250150" className="w-full">
-                <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-light justify-start w-full">
-                  <Phone className="h-4 w-4 mr-2" />
-                  0503250150
-                </Button>
-              </a>
-              <a href="mailto:hen1kahlon@gmail.com" className="w-full">
-                <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-light justify-start w-full">
-                  <Mail className="h-4 w-4 mr-2" />
-                  אימייל
-                </Button>
-              </a>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-primary-foreground hover:bg-primary-light justify-start w-full"
+                onClick={() => window.open('tel:0503250150', '_self')}
+              >
+                <Phone className="h-4 w-4 mr-2" />
+                0503250150
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-primary-foreground hover:bg-primary-light justify-start w-full"
+                onClick={() => window.open('mailto:hen1kahlon@gmail.com', '_self')}  
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                אימייל
+              </Button>
               {isAdmin ? (
                 <>
                   <Button 

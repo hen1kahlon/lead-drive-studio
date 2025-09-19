@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, Car, Users, Award, Phone, Mail, MapPin, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
@@ -105,18 +106,23 @@ const Index = () => {
               </Badge>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="tel:0503250150" className="flex-1 sm:flex-initial">
-                <Button size="lg" className="bg-accent hover:bg-accent-light text-accent-foreground text-lg px-8 py-4 w-full">
-                  <Phone className="w-5 h-5 mr-2" />
-                  התקשר עכשיו
-                </Button>
-              </a>
-              <a href="mailto:hen1kahlon@gmail.com" className="flex-1 sm:flex-initial">
-                <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-4 w-full">
-                  <Mail className="w-5 h-5 mr-2" />
-                  שלח מייל
-                </Button>
-              </a>
+              <Button 
+                size="lg" 
+                className="bg-accent hover:bg-accent-light text-accent-foreground text-lg px-8 py-4 flex-1 sm:flex-initial"
+                onClick={() => window.open('tel:0503250150', '_self')}
+              >
+                <Phone className="w-5 h-5 mr-2" />
+                התקשר עכשיו
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-4 flex-1 sm:flex-initial"
+                onClick={() => window.open('mailto:hen1kahlon@gmail.com', '_self')}
+              >
+                <Mail className="w-5 h-5 mr-2" />
+                שלח מייל
+              </Button>
             </div>
           </div>
         </div>
@@ -132,42 +138,57 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Service Categories */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-12">
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-8 text-center">
-              <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-6">
-                <Users className="w-10 h-10 text-primary-foreground" />
+          {/* Service Categories with Tabs */}
+          <Tabs defaultValue="students" className="max-w-4xl mx-auto">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="students" className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                לתלמידים
+              </TabsTrigger>
+              <TabsTrigger value="instructors" className="flex items-center gap-2">
+                <Car className="w-4 h-4" />
+                למורי נהיגה
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="students">
+              <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-8 text-center mb-8">
+                <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-6">
+                  <Users className="w-10 h-10 text-primary-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold text-primary mb-4">שיעורי נהיגה לתלמידים</h3>
+                <p className="text-lg text-muted-foreground mb-6">
+                  למד נהיגה בצורה מקצועית ובטוחה עם מורה מנוסה
+                </p>
+                <Button 
+                  size="lg" 
+                  onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-primary hover:bg-primary-dark text-primary-foreground"
+                >
+                  התחל ללמוד נהיגה
+                </Button>
               </div>
-              <h3 className="text-2xl font-bold text-primary mb-4">לתלמידים</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                למד נהיגה בצורה מקצועית ובטוחה עם מורה מנוסה
-              </p>
-              <Button 
-                size="lg" 
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-primary hover:bg-primary-dark text-primary-foreground"
-              >
-                התחל ללמוד נהיגה
-              </Button>
-            </div>
-            
-            <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-8 text-center">
-              <div className="mx-auto w-20 h-20 bg-accent rounded-full flex items-center justify-center mb-6">
-                <Car className="w-10 h-10 text-accent-foreground" />
+            </TabsContent>
+
+            <TabsContent value="instructors">
+              <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-8 text-center mb-8">
+                <div className="mx-auto w-20 h-20 bg-accent rounded-full flex items-center justify-center mb-6">
+                  <Car className="w-10 h-10 text-accent-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold text-accent mb-4">השכרת רכבים למורי נהיגה</h3>
+                <p className="text-lg text-muted-foreground mb-6">
+                  השכר רכבים מקצועיים עם בקרות כפולות לעבודה
+                </p>
+                <Button 
+                  size="lg" 
+                  onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-accent hover:bg-accent-light text-accent-foreground"
+                >
+                  השכר רכב להוראה
+                </Button>
               </div>
-              <h3 className="text-2xl font-bold text-accent mb-4">למורי נהיגה</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                השכר רכבים מקצועיים עם בקרות כפולות לעבודה
-              </p>
-              <Button 
-                size="lg" 
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-accent hover:bg-accent-light text-accent-foreground"
-              >
-                השכר רכב להוראה
-              </Button>
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="shadow-lg hover:shadow-xl transition-shadow">

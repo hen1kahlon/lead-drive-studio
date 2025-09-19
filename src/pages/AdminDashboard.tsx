@@ -5,17 +5,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { Lead, Review } from '../types';
-import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download } from 'lucide-react';
+import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key } from 'lucide-react';
 import Header from '../components/Header';
 import * as XLSX from 'xlsx';
+
+interface SocialMedia {
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  whatsapp?: string;
+}
 
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [socialMedia, setSocialMedia] = useState<SocialMedia>({});
+  const [tempSocialMedia, setTempSocialMedia] = useState<SocialMedia>({});
 
   useEffect(() => {
     if (!isAdmin) {
@@ -27,6 +38,7 @@ const AdminDashboard = () => {
     // Load data from localStorage (in real app, this would come from Supabase)
     const savedLeads = localStorage.getItem('leads');
     const savedReviews = localStorage.getItem('reviews');
+    const savedSocialMedia = localStorage.getItem('socialMedia');
     
     if (savedLeads) {
       setLeads(JSON.parse(savedLeads).map((lead: any) => ({
@@ -39,6 +51,11 @@ const AdminDashboard = () => {
         ...review,
         createdAt: new Date(review.createdAt)
       })));
+    }
+    if (savedSocialMedia) {
+      const parsed = JSON.parse(savedSocialMedia);
+      setSocialMedia(parsed);
+      setTempSocialMedia(parsed);
     }
   }, []);
 
@@ -81,6 +98,13 @@ const AdminDashboard = () => {
       'תאריך': review.createdAt.toLocaleDateString('he-IL')
     }));
     exportToExcel(reviewsData, 'ביקורות', 'ביקורות');
+  };
+
+  const saveSocialMedia = () => {
+    setSocialMedia(tempSocialMedia);
+    localStorage.setItem('socialMedia', JSON.stringify(tempSocialMedia));
+    // Trigger header refresh by dispatching a custom event
+    window.dispatchEvent(new CustomEvent('socialMediaUpdated'));
   };
 
   const renderStars = (rating: number) => {
@@ -154,7 +178,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="leads" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="leads" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">לידים</span>
@@ -163,9 +187,13 @@ const AdminDashboard = () => {
               <MessageSquare className="w-4 h-4" />
               <span className="hidden sm:inline">ביקורות</span>
             </TabsTrigger>
+            <TabsTrigger value="social" className="flex items-center gap-2">
+              <Facebook className="w-4 h-4" />
+              <span className="hidden sm:inline">רשתות</span>
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">הגדרות</span>
+              <span className="hidden sm:inline">אבטחה</span>
             </TabsTrigger>
           </TabsList>
 
@@ -316,61 +344,166 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="settings">
+          <TabsContent value="social">
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  הגדרות האתר
+                  <Facebook className="w-5 h-5" />
+                  ניהול רשתות חברתיות
                 </CardTitle>
                 <CardDescription>
-                  ניהול הגדרות כלליות ותצורת האתר
+                  הוסף קישורים לרשתות החברתיות שיוצגו בראש הדף
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">פרטי יצירת קשר</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <p><strong>שם:</strong> חן כחלון</p>
-                      <p><strong>טלפון:</strong> 0503250150</p>
-                      <p><strong>אימייל:</strong> hen1kahlon@gmail.com</p>
-                    </CardContent>
-                  </Card>
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="facebook" className="flex items-center gap-2">
+                      <Facebook className="w-4 h-4" />
+                      פייסבוק
+                    </Label>
+                    <Input
+                      id="facebook"
+                      type="url"
+                      placeholder="https://facebook.com/yourprofile"
+                      value={tempSocialMedia.facebook || ''}
+                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, facebook: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="instagram" className="flex items-center gap-2">
+                      <Instagram className="w-4 h-4" />
+                      אינסטגרם
+                    </Label>
+                    <Input
+                      id="instagram"
+                      type="url"
+                      placeholder="https://instagram.com/yourprofile"
+                      value={tempSocialMedia.instagram || ''}
+                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, instagram: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="tiktok" className="flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4" />
+                      טיקטוק
+                    </Label>
+                    <Input
+                      id="tiktok"
+                      type="url"
+                      placeholder="https://tiktok.com/@yourprofile"
+                      value={tempSocialMedia.tiktok || ''}
+                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, tiktok: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp" className="flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4" />
+                      וואטסאפ
+                    </Label>
+                    <Input
+                      id="whatsapp"
+                      type="url"
+                      placeholder="https://wa.me/972503250150"
+                      value={tempSocialMedia.whatsapp || ''}
+                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, whatsapp: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <Button onClick={saveSocialMedia} className="flex items-center gap-2">
+                  <Save className="w-4 h-4" />
+                  שמור שינויים
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <div className="space-y-6">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    אבטחה וניהול
+                  </CardTitle>
+                  <CardDescription>
+                    המלצות אבטחה וניהול המערכת
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                    <h4 className="font-semibold text-destructive mb-2 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      המלצות אבטחה חשובות
+                    </h4>
+                    <ul className="text-sm space-y-2 text-foreground">
+                      <li className="flex items-start gap-2">
+                        <Key className="w-4 h-4 mt-0.5 text-destructive" />
+                        <span><strong>שנה את פרטי ההתחברות:</strong> כרגע המערכת משתמשת בfixed credentials (admin/admin). מומלץ להוסיף מסד נתונים לניהול משתמשים מאובטח.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Key className="w-4 h-4 mt-0.5 text-destructive" />
+                        <span><strong>הצפנת נתונים:</strong> כרגע הנתונים נשמרים ב-localStorage. מומלץ לעבור ל-Supabase לאחסון מאובטח.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Key className="w-4 h-4 mt-0.5 text-destructive" />
+                        <span><strong>HTTPS:</strong> ודא שהאתר פועל תמיד תחת HTTPS בפרודקשן.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Key className="w-4 h-4 mt-0.5 text-destructive" />
+                        <span><strong>גיבויים:</strong> הגדר גיבויים אוטומטיים לנתונים החשובים.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">פרטי יצירת קשר</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <p><strong>שם:</strong> חן כחלון</p>
+                        <p><strong>טלפון:</strong> 0503250150</p>
+                        <p><strong>אימייל:</strong> hen1kahlon@gmail.com</p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">סטטיסטיקות האתר</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <p><strong>סך הלידים:</strong> {leads.length}</p>
+                        <p><strong>סך הביקורות:</strong> {reviews.length}</p>
+                        <p><strong>דירוג ממוצע:</strong> {
+                          reviews.length > 0 
+                            ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                            : 'N/A'
+                        }</p>
+                      </CardContent>
+                    </Card>
+                  </div>
                   
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">סטטיסטיקות האתר</CardTitle>
+                      <CardTitle className="text-lg">שדרוגים מומלצים</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2">
-                      <p><strong>סך הלידים:</strong> {leads.length}</p>
-                      <p><strong>סך הביקורות:</strong> {reviews.length}</p>
-                      <p><strong>דירוג ממוצע:</strong> {
-                        reviews.length > 0 
-                          ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-                          : 'N/A'
-                      }</p>
+                    <CardContent>
+                      <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                        <p className="text-foreground">
+                          <strong>לתפעול מלא של המערכת:</strong> כדי לשמור נתונים באופן קבוע ולהוסיף תכונות כמו אותנטיפיקציה מתקדמת, 
+                          מסד נתונים מרכזי ושליחת מיילים אוטומטיים, מומלץ להתחבר לSupabase.
+                        </p>
+                      </div>
                     </CardContent>
                   </Card>
-                </div>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">הודעה חשובה</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
-                      <p className="text-foreground">
-                        <strong>לתפעול מלא של המערכת:</strong> כדי לשמור נתונים באופן קבוע ולהוסיף תכונות כמו אותנטיפיקציה מתקדמת, 
-                        מסד נתונים מרכזי ושליחת מיילים אוטומטיים, מומלץ להתחבר לSupabase.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
