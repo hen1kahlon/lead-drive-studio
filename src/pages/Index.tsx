@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Star, Car, Users, Award, Phone, Mail, MapPin, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-driving.jpg';
+import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
 import dashboardImage from '@/assets/dashboard.jpg';
 import LeadForm from '../components/LeadForm';
 import ReviewForm from '../components/ReviewForm';
@@ -72,13 +73,14 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-primary overflow-hidden">
+      <section className="relative bg-primary overflow-hidden driving-background">
         <div className="absolute inset-0">
           <img 
-            src={heroImage} 
-            alt="מורה נהיגה מקצועי"
-            className="w-full h-full object-cover opacity-20"
+            src={steeringWheelImage} 
+            alt="נוף מתוך הרכב - הגה ודרך"
+            className="w-full h-full object-cover opacity-30"
           />
+          <div className="road-animation"></div>
         </div>
         <div className="relative container mx-auto px-4 py-20 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
@@ -103,27 +105,68 @@ const Index = () => {
               </Badge>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-accent hover:bg-accent-light text-accent-foreground text-lg px-8 py-4">
-                <Phone className="w-5 h-5 mr-2" />
-                0503250150
-              </Button>
-              <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-4">
-                <Mail className="w-5 h-5 mr-2" />
-                hen1kahlon@gmail.com
-              </Button>
+              <a href="tel:0503250150" className="flex-1 sm:flex-initial">
+                <Button size="lg" className="bg-accent hover:bg-accent-light text-accent-foreground text-lg px-8 py-4 w-full">
+                  <Phone className="w-5 h-5 mr-2" />
+                  התקשר עכשיו
+                </Button>
+              </a>
+              <a href="mailto:hen1kahlon@gmail.com" className="flex-1 sm:flex-initial">
+                <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary text-lg px-8 py-4 w-full">
+                  <Mail className="w-5 h-5 mr-2" />
+                  שלח מייל
+                </Button>
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* Services Section */}
-      <section className="py-16 bg-surface">
+      <section id="services" className="py-16 bg-surface">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">השירותים שלנו</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              מציעים פתרונות מקצועיים ללימוד נהיגה והשכרת רכבים למורי נהיגה
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">השירותים שלנו</h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              פתרונות מקצועיים ללימוד נהיגה והשכרת רכבים למורי נהיגה
             </p>
+          </div>
+          
+          {/* Service Categories */}
+          <div className="grid lg:grid-cols-2 gap-8 mb-12">
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-8 text-center">
+              <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-6">
+                <Users className="w-10 h-10 text-primary-foreground" />
+              </div>
+              <h3 className="text-2xl font-bold text-primary mb-4">לתלמידים</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                למד נהיגה בצורה מקצועית ובטוחה עם מורה מנוסה
+              </p>
+              <Button 
+                size="lg" 
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-primary hover:bg-primary-dark text-primary-foreground"
+              >
+                התחל ללמוד נהיגה
+              </Button>
+            </div>
+            
+            <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-8 text-center">
+              <div className="mx-auto w-20 h-20 bg-accent rounded-full flex items-center justify-center mb-6">
+                <Car className="w-10 h-10 text-accent-foreground" />
+              </div>
+              <h3 className="text-2xl font-bold text-accent mb-4">למורי נהיגה</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                השכר רכבים מקצועיים עם בקרות כפולות לעבודה
+              </p>
+              <Button 
+                size="lg" 
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-accent hover:bg-accent-light text-accent-foreground"
+              >
+                השכר רכב להוראה
+              </Button>
+            </div>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -196,11 +239,11 @@ const Index = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="py-16">
+      <section id="contact" className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">צור קשר</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">צור קשר</h2>
+            <p className="text-lg md:text-xl text-muted-foreground">
               מוכן להתחיל? צור איתנו קשר עוד היום
             </p>
           </div>
@@ -210,14 +253,14 @@ const Index = () => {
               <div className="text-center lg:text-right">
                 <h3 className="text-2xl font-bold mb-6">פרטי יצירת קשר</h3>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-center lg:justify-start space-x-4">
+                  <a href="tel:0503250150" className="flex items-center justify-center lg:justify-start space-x-4 hover:text-primary transition-colors">
                     <Phone className="w-6 h-6 text-primary" />
                     <span className="text-lg">0503250150</span>
-                  </div>
-                  <div className="flex items-center justify-center lg:justify-start space-x-4">
+                  </a>
+                  <a href="mailto:hen1kahlon@gmail.com" className="flex items-center justify-center lg:justify-start space-x-4 hover:text-primary transition-colors">
                     <Mail className="w-6 h-6 text-primary" />
                     <span className="text-lg">hen1kahlon@gmail.com</span>
-                  </div>
+                  </a>
                   <div className="flex items-center justify-center lg:justify-start space-x-4">
                     <MapPin className="w-6 h-6 text-primary" />
                     <span className="text-lg">שירות באזור המרכז</span>
@@ -258,10 +301,10 @@ const Index = () => {
       <Separator />
 
       {/* Reviews Section */}
-      <section className="py-16 bg-surface">
+      <section id="reviews" className="py-16 bg-surface">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">מה אומרים עלינו</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">מה אומרים עלינו</h2>
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="flex">
                 {Array.from({ length: 5 }, (_, i) => (

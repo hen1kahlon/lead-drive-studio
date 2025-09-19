@@ -120,3 +120,71 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Live Background Animation - Driving Experience */
+@keyframes drive-forward {
+  0% { transform: translateZ(0) perspective(1000px); }
+  100% { transform: translateZ(-100px) perspective(1000px); }
+}
+
+@keyframes road-lines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(20px); }
+}
+
+@keyframes dashboard-glow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.driving-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.driving-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg, 
+    transparent 0%, 
+    hsl(var(--primary) / 0.05) 50%, 
+    hsl(var(--primary) / 0.1) 100%
+  );
+  animation: drive-forward 3s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+.road-animation {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 40px,
+    hsl(var(--primary) / 0.1) 40px,
+    hsl(var(--primary) / 0.1) 44px
+  );
+  animation: road-lines 2s linear infinite;
+  opacity: 0.3;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .container {
+    @apply px-2;
+  }
+  
+  .driving-background::before {
+    animation-duration: 4s;
+  }
+  
+  .road-animation {
+    animation-duration: 3s;
+  }
+}

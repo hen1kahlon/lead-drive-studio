@@ -7,8 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '../contexts/AuthContext';
 import { Lead, Review } from '../types';
-import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star } from 'lucide-react';
+import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download } from 'lucide-react';
 import Header from '../components/Header';
+import * as XLSX from 'xlsx';
 
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
@@ -51,6 +52,35 @@ const AdminDashboard = () => {
     const updatedReviews = reviews.filter(review => review.id !== id);
     setReviews(updatedReviews);
     localStorage.setItem('reviews', JSON.stringify(updatedReviews));
+  };
+
+  const exportToExcel = (data: any[], filename: string, sheetName: string) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    XLSX.writeFile(workbook, `${filename}.xlsx`);
+  };
+
+  const exportLeads = () => {
+    const leadsData = leads.map(lead => ({
+      'שם': lead.name,
+      'אימייל': lead.email,
+      'טלפון': lead.phone,
+      'סוג שירות': lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב',
+      'הודעה': lead.message || '',
+      'תאריך': lead.createdAt.toLocaleDateString('he-IL')
+    }));
+    exportToExcel(leadsData, 'לידים', 'לידים');
+  };
+
+  const exportReviews = () => {
+    const reviewsData = reviews.map(review => ({
+      'שם': review.name,
+      'דירוג': review.rating,
+      'הערה': review.comment,
+      'תאריך': review.createdAt.toLocaleDateString('he-IL')
+    }));
+    exportToExcel(reviewsData, 'ביקורות', 'ביקורות');
   };
 
   const renderStars = (rating: number) => {
@@ -127,28 +157,38 @@ const AdminDashboard = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="leads" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              לידים
+              <span className="hidden sm:inline">לידים</span>
             </TabsTrigger>
             <TabsTrigger value="reviews" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
-              ביקורות
+              <span className="hidden sm:inline">ביקורות</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              הגדרות
+              <span className="hidden sm:inline">הגדרות</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="leads">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  ניהול לידים
-                </CardTitle>
-                <CardDescription>
-                  כל הפניות שהתקבלו דרך אתר האינטרנט
-                </CardDescription>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      ניהול לידים
+                    </CardTitle>
+                    <CardDescription>
+                      כל הפניות שהתקבלו דרך אתר האינטרנט
+                    </CardDescription>
+                  </div>
+                  {leads.length > 0 && (
+                    <Button onClick={exportLeads} className="flex items-center gap-2">
+                      <Download className="w-4 h-4" />
+                      ייצא לאקסל
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {leads.length === 0 ? (
@@ -217,13 +257,23 @@ const AdminDashboard = () => {
           <TabsContent value="reviews">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  ניהול ביקורות
-                </CardTitle>
-                <CardDescription>
-                  כל הביקורות שהתקבלו מהתלמידים
-                </CardDescription>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5" />
+                      ניהול ביקורות
+                    </CardTitle>
+                    <CardDescription>
+                      כל הביקורות שהתקבלו מהתלמידים
+                    </CardDescription>
+                  </div>
+                  {reviews.length > 0 && (
+                    <Button onClick={exportReviews} className="flex items-center gap-2">
+                      <Download className="w-4 h-4" />
+                      ייצא לאקסל
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {reviews.length === 0 ? (
