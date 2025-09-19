@@ -106,26 +106,17 @@ const Index = () => {
                 מאות תלמידים
               </Badge>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            <div className="flex justify-center mb-6">
               <Button 
                 size="lg" 
                 variant="success"
                 asChild
-                className="text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="text-lg px-8 py-4 shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <a href="tel:0503250150" aria-label="התקשר עכשיו">
                   <Phone className="w-5 h-5 mr-2" />
                   התקשר עכשיו
                 </a>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4 flex-1 sm:flex-initial shadow-lg transform hover:scale-105 transition-all duration-200"
-                onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
-              >
-                <Mail className="w-5 h-5 mr-2" />
-                יצירת קשר
               </Button>
             </div>
             
@@ -134,47 +125,47 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3"
                 onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
                 aria-label="Gmail"
               >
-                <Mail className="h-6 w-6" />
+                <Mail className="h-6 w-6" style={{ color: '#EA4335' }} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3"
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <MessageCircle className="h-6 w-6" />
+                <MessageCircle className="h-6 w-6" style={{ color: '#25D366' }} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3"
                 onClick={() => window.open('https://tiktok.com/@hen_kahlon', '_blank')}
                 aria-label="טיקטוק"
               >
-                <Music className="h-6 w-6" />
+                <Music className="h-6 w-6" style={{ color: '#000000' }} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3"
                 onClick={() => window.open('https://facebook.com/hen.kahlon', '_blank')}
                 aria-label="פייסבוק"
               >
-                <Facebook className="h-6 w-6" />
+                <Facebook className="h-6 w-6" style={{ color: '#1877F2' }} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary-foreground hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3"
                 onClick={() => window.open('https://instagram.com/hen_kahlon', '_blank')}
                 aria-label="אינסטגרם"
               >
-                <Instagram className="h-6 w-6" />
+                <Instagram className="h-6 w-6" style={{ color: '#E4405F' }} />
               </Button>
             </div>
           </div>
