@@ -8,13 +8,20 @@ interface ProfileData {
 }
 
 const ProfileSection = () => {
-  const [profileData, setProfileData] = useState<ProfileData>({});
+  const [profileData, setProfileData] = useState<ProfileData>({
+    image: '/src/assets/chen-profile.jpg',
+    description: '🚗 Love Drive Teach in Tel Aviv\n🚥 מורה נהיגה מוסמך\n📍 בת ים\n48 פוסטים • 210 עוקבים'
+  });
 
   useEffect(() => {
     const loadProfile = () => {
       const saved = localStorage.getItem('profileData');
       if (saved) {
-        setProfileData(JSON.parse(saved));
+        const savedData = JSON.parse(saved);
+        setProfileData(prev => ({
+          ...prev,
+          ...savedData
+        }));
       }
     };
 
@@ -28,11 +35,6 @@ const ProfileSection = () => {
     window.addEventListener('profileUpdated', handleProfileUpdate);
     return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
   }, []);
-
-  // Don't render if no profile data
-  if (!profileData.image && !profileData.description) {
-    return null;
-  }
 
   return (
     <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
