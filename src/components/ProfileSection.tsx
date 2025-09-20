@@ -16,7 +16,7 @@ const ProfileSection = () => {
     
     const newProfileData = {
       image: '/chen-profile.jpg',
-      description: '🚗 Love Drive Teach in Tel Aviv\n🚥 מורה נהיגה מוסמך\n📍 בת ים\n48 פוסטים • 210 עוקבים'
+      description: '🚗 Love Drive\n🏙️ Teach in Tel Aviv\n📍 Bat Yam'
     };
     
     setProfileData(newProfileData);
@@ -63,7 +63,7 @@ const ProfileSection = () => {
                 
                 <div className="space-y-2 mb-6">
                   <h3 className="text-xl font-semibold text-primary">
-                    מורה נהיגה מוסמך ומשכיר רכבי הוראה
+                    חן כחלון מורה לנהיגה
                   </h3>
                 </div>
                 
