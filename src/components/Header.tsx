@@ -137,7 +137,7 @@ const Header = () => {
                   className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.whatsapp, '_blank')}
                 >
-                  <Phone className="h-4 w-4" style={{ color: '#25D366' }} />
+                  <MessageCircle className="h-4 w-4" style={{ color: '#25D366' }} />
                 </Button>
               )}
             </div>
