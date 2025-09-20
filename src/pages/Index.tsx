@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Music, Facebook, Instagram, Mail, Star, Car, Users, Award, Phone, MapPin, Clock } from 'lucide-react';
+import { MessageCircle, Music, Facebook, Instagram, Mail, AtSign, Star, Car, Users, Award, Phone, MapPin, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
 import dashboardImage from '@/assets/dashboard.jpg';
@@ -129,7 +129,7 @@ const Index = () => {
                 onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
                 aria-label="Gmail"
               >
-                <Mail className="h-6 w-6" style={{ color: '#EA4335' }} />
+                <AtSign className="h-6 w-6" style={{ color: '#EA4335' }} />
               </Button>
               <Button
                 variant="ghost"
