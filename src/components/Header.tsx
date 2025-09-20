@@ -3,6 +3,7 @@ import { Car, LogOut, Settings, Menu, Phone, Mail, AtSign, Facebook, Instagram, 
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import whatsappIcon from '@/assets/whatsapp-icon.png';
 
 interface SocialMedia {
   facebook?: string;
@@ -137,7 +138,7 @@ const Header = () => {
                   className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.whatsapp, '_blank')}
                 >
-                  <MessageCircle className="h-4 w-4" style={{ color: '#25D366' }} />
+                  <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4" />
                 </Button>
               )}
             </div>
