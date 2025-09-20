@@ -9,7 +9,7 @@ interface ProfileData {
 
 const ProfileSection = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
-    image: '/src/assets/chen-profile.jpg',
+    image: '/chen-profile.jpg',
     description: '🚗 Love Drive Teach in Tel Aviv\n🚥 מורה נהיגה מוסמך\n📍 בת ים\n48 פוסטים • 210 עוקבים'
   });
 
