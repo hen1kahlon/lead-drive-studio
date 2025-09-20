@@ -17,7 +17,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [socialMedia, setSocialMedia] = useState<SocialMedia>({
     instagram: 'https://instagram.com/hen_driver',
-    facebook: 'https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL'
+    facebook: 'https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL',
+    tiktok: 'https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1'
   });
 
   useEffect(() => {
