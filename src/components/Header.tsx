@@ -16,7 +16,8 @@ const Header = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [socialMedia, setSocialMedia] = useState<SocialMedia>({
-    instagram: 'https://instagram.com/hen_driver'
+    instagram: 'https://instagram.com/hen_driver',
+    facebook: 'https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL'
   });
 
   useEffect(() => {

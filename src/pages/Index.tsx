@@ -153,7 +153,7 @@ const Index = () => {
                 variant="ghost"
                 size="sm"
                 className="hover:bg-primary-light/20 p-3"
-                onClick={() => window.open('https://facebook.com/hen.kahlon', '_blank')}
+                onClick={() => window.open('https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL', '_blank')}
                 aria-label="פייסבוק"
               >
                 <Facebook className="h-6 w-6" style={{ color: '#1877F2' }} />
