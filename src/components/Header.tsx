@@ -127,7 +127,7 @@ const Header = () => {
                   className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.tiktok, '_blank')}
                 >
-                  <Type className="h-4 w-4" style={{ color: '#000000' }} />
+                  <Music className="h-4 w-4" style={{ color: '#000000' }} />
                 </Button>
               )}
               {socialMedia.whatsapp && (
