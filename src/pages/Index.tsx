@@ -8,7 +8,7 @@ import { MessageCircle, Music, Video, Triangle, Type, Facebook, Instagram, Mail,
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
 import dashboardImage from '@/assets/dashboard.jpg';
-import whatsappIcon from '@/assets/whatsapp-icon.png';
+
 import LeadForm from '../components/LeadForm';
 import ReviewForm from '../components/ReviewForm';
 import ReviewsList from '../components/ReviewsList';
@@ -139,7 +139,7 @@ const Index = () => {
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <img src={whatsappIcon} alt="WhatsApp" className="h-6 w-6" />
+                <MessageCircle className="h-6 w-6 text-success" />
               </Button>
               <Button
                 variant="ghost"
