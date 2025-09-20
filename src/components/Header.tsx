@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Car, LogOut, Settings, Menu, Phone, Mail, Facebook, Instagram, MessageCircle, Music } from 'lucide-react';
+import { Car, LogOut, Settings, Menu, Phone, Mail, AtSign, Facebook, Instagram, MessageCircle, Music } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -230,7 +230,7 @@ const Header = () => {
                 className="text-primary-foreground hover:bg-primary-light justify-start w-full"
                 onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}  
               >
-                <Mail className="h-4 w-4 mr-2" />
+                <AtSign className="h-4 w-4 mr-2" />
                 אימייל
               </Button>
               {isAdmin ? (
