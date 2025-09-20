@@ -15,7 +15,9 @@ const Header = () => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [socialMedia, setSocialMedia] = useState<SocialMedia>({});
+  const [socialMedia, setSocialMedia] = useState<SocialMedia>({
+    instagram: 'https://instagram.com/hen_driver'
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem('socialMedia');

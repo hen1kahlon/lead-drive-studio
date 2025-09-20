@@ -162,7 +162,7 @@ const Index = () => {
                 variant="ghost"
                 size="sm"
                 className="hover:bg-primary-light/20 p-3"
-                onClick={() => window.open('https://instagram.com/hen_kahlon', '_blank')}
+                onClick={() => window.open('https://instagram.com/hen_driver', '_blank')}
                 aria-label="אינסטגרם"
               >
                 <Instagram className="h-6 w-6" style={{ color: '#E4405F' }} />
