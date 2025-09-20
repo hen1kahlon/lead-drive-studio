@@ -8,28 +8,26 @@ interface ProfileData {
 }
 
 const ProfileSection = () => {
-  const [profileData, setProfileData] = useState<ProfileData>({
-    image: '/chen-profile.jpg',
-    description: '🚗 Love Drive Teach in Tel Aviv\n🚥 מורה נהיגה מוסמך\n📍 בת ים\n48 פוסטים • 210 עוקבים'
-  });
+  const [profileData, setProfileData] = useState<ProfileData>({});
 
   useEffect(() => {
-    const loadProfile = () => {
-      const saved = localStorage.getItem('profileData');
-      if (saved) {
-        const savedData = JSON.parse(saved);
-        setProfileData(prev => ({
-          ...prev,
-          ...savedData
-        }));
-      }
+    // Clear old profile data and set new data
+    localStorage.removeItem('profileData');
+    
+    const newProfileData = {
+      image: '/chen-profile.jpg',
+      description: '🚗 Love Drive Teach in Tel Aviv\n🚥 מורה נהיגה מוסמך\n📍 בת ים\n48 פוסטים • 210 עוקבים'
     };
-
-    loadProfile();
+    
+    setProfileData(newProfileData);
+    localStorage.setItem('profileData', JSON.stringify(newProfileData));
 
     // Listen for profile updates
     const handleProfileUpdate = () => {
-      loadProfile();
+      const saved = localStorage.getItem('profileData');
+      if (saved) {
+        setProfileData(JSON.parse(saved));
+      }
     };
 
     window.addEventListener('profileUpdated', handleProfileUpdate);
