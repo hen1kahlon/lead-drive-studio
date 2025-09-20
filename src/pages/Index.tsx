@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Music, Video, Triangle, Facebook, Instagram, Mail, AtSign, Star, Car, Users, Award, Phone, MapPin, Clock } from 'lucide-react';
+import { MessageCircle, Music, Video, Triangle, Type, Facebook, Instagram, Mail, AtSign, Star, Car, Users, Award, Phone, MapPin, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
 import dashboardImage from '@/assets/dashboard.jpg';
@@ -147,7 +147,7 @@ const Index = () => {
                 onClick={() => window.open('https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1', '_blank')}
                 aria-label="טיקטוק"
               >
-                <Triangle className="h-6 w-6" style={{ color: '#000000' }} />
+                <Type className="h-6 w-6" style={{ color: '#000000' }} />
               </Button>
               <Button
                 variant="ghost"

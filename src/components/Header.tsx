@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Car, LogOut, Settings, Menu, Phone, Mail, AtSign, Facebook, Instagram, MessageCircle, Music, Video, Triangle } from 'lucide-react';
+import { Car, LogOut, Settings, Menu, Phone, Mail, AtSign, Facebook, Instagram, MessageCircle, Music, Video, Triangle, Type } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -127,7 +127,7 @@ const Header = () => {
                   className="hover:bg-primary-light p-2"
                   onClick={() => window.open(socialMedia.tiktok, '_blank')}
                 >
-                  <Triangle className="h-4 w-4" style={{ color: '#000000' }} />
+                  <Type className="h-4 w-4" style={{ color: '#000000' }} />
                 </Button>
               )}
               {socialMedia.whatsapp && (
