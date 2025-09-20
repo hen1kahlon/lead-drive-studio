@@ -45,7 +45,7 @@ const ProfileSection = () => {
                   <div className="relative">
                     <img 
                       src={profileData.image} 
-                      alt="חן כחלון - מורה נהיגה"
+                      alt="hen_driver - מורה נהיגה"
                       className="w-48 h-48 lg:w-56 lg:h-56 rounded-full object-cover border-4 border-primary shadow-lg"
                     />
                     <div className="absolute inset-0 rounded-full bg-gradient-to-t from-primary/20 to-transparent"></div>
@@ -57,7 +57,7 @@ const ProfileSection = () => {
                 <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
                   <User className="w-8 h-8 text-primary" />
                   <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-                    חן כחלון
+                    hen_driver
                   </h2>
                 </div>
                 
