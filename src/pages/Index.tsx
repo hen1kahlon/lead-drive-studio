@@ -147,7 +147,7 @@ const Index = () => {
                 onClick={() => window.open('https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1', '_blank')}
                 aria-label="טיקטוק"
               >
-                <Music className="h-6 w-6" style={{ color: '#000000' }} />
+                <span className="text-sm font-bold" style={{ color: '#000000' }}>TikTok</span>
               </Button>
               <Button
                 variant="ghost"
