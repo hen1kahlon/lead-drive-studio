@@ -138,7 +138,7 @@ const Index = () => {
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <MessageCircle className="h-6 w-6" style={{ color: '#25D366' }} />
+                <Phone className="h-6 w-6" style={{ color: '#25D366' }} />
               </Button>
               <Button
                 variant="ghost"
