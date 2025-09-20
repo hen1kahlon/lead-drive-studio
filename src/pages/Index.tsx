@@ -135,11 +135,11 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3 bg-transparent border-none"
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <img src={whatsappIcon} alt="WhatsApp" className="h-6 w-6" />
+                <img src={whatsappIcon} alt="WhatsApp" className="h-6 w-6 bg-transparent" />
               </Button>
               <Button
                 variant="ghost"

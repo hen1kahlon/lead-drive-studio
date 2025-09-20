@@ -135,10 +135,10 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hover:bg-primary-light p-2"
+                  className="hover:bg-primary-light p-2 bg-transparent border-none"
                   onClick={() => window.open(socialMedia.whatsapp, '_blank')}
                 >
-                  <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4" />
+                  <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4 bg-transparent" />
                 </Button>
               )}
             </div>
