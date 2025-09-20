@@ -144,7 +144,7 @@ const Index = () => {
                 variant="ghost"
                 size="sm"
                 className="hover:bg-primary-light/20 p-3"
-                onClick={() => window.open('https://tiktok.com/@hen_kahlon', '_blank')}
+                onClick={() => window.open('https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1', '_blank')}
                 aria-label="טיקטוק"
               >
                 <Music className="h-6 w-6" style={{ color: '#000000' }} />
