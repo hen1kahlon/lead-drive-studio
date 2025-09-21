@@ -91,7 +91,7 @@ const Index = () => {
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               חן כחלון - מורה נהיגה מוסמך
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
+            <p className="text-xl md:text-2xl mb-8 font-semibold text-white shadow-lg bg-primary-dark/30 backdrop-blur-sm rounded-lg px-6 py-4 border border-white/20">
               שיעורי נהיגה מקצועיים והשכרת רכבים למורי נהיגה
             </p>
             <div className="flex flex-wrap justify-center gap-4 mb-8">
