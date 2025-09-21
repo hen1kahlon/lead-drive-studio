@@ -81,8 +81,9 @@ const Index = () => {
           <img 
             src={steeringWheelImage} 
             alt="נוף מתוך הרכב - הגה ודרך"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-60"
           />
+          <div className="absolute inset-0 bg-primary/40"></div>
           <div className="road-animation"></div>
         </div>
         <div className="relative container mx-auto px-4 py-20 text-center text-primary-foreground">
