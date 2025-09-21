@@ -154,8 +154,8 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="lg"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-blue-600 hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-600/50"
-                onClick={() => window.open('https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL', '_blank')}
+                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-blue-600 hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-600/50 focus:bg-white/10 active:bg-white/10 focus:scale-100 active:scale-95 focus:rotate-0 active:rotate-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                onClick={(e) => { (e.currentTarget as HTMLButtonElement).blur(); window.open('https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL', '_blank'); }}
                 aria-label="פייסבוק"
               >
                 <Facebook className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#1877F2" />
