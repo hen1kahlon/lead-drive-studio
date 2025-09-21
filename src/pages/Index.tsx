@@ -131,7 +131,7 @@ const Index = () => {
                 onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
                 aria-label="Gmail"
               >
-                <AtSign className="h-8 w-8 text-white transition-all duration-300 hover:scale-110" />
+                <AtSign className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#EA4335" />
               </Button>
               <Button
                 variant="ghost"
@@ -140,7 +140,7 @@ const Index = () => {
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <MessageCircle className="h-8 w-8 text-white transition-all duration-300 hover:scale-110" />
+                <MessageCircle className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#25D366" />
               </Button>
               <Button
                 variant="ghost"
@@ -149,7 +149,7 @@ const Index = () => {
                 onClick={() => window.open('https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1', '_blank')}
                 aria-label="טיקטוק"
               >
-                <span className="text-lg font-bold text-white transition-all duration-300 hover:scale-110">TikTok</span>
+                <span className="text-lg font-bold transition-all duration-300 hover:scale-110" style={{ color: '#000000' }}>TikTok</span>
               </Button>
               <Button
                 variant="ghost"
@@ -158,7 +158,7 @@ const Index = () => {
                 onClick={() => window.open('https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL', '_blank')}
                 aria-label="פייסבוק"
               >
-                <Facebook className="h-8 w-8 text-white transition-all duration-300 hover:scale-110" />
+                <Facebook className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#1877F2" />
               </Button>
               <Button
                 variant="ghost"
@@ -167,7 +167,7 @@ const Index = () => {
                 onClick={() => window.open('https://instagram.com/hen_driver', '_blank')}
                 aria-label="אינסטגרם"
               >
-                <Instagram className="h-8 w-8 text-white transition-all duration-300 hover:scale-110" />
+                <Instagram className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#E4405F" />
               </Button>
             </div>
           </div>
