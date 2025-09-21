@@ -76,14 +76,14 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-primary overflow-hidden driving-background">
+      <section className="relative overflow-hidden driving-background">
         <div className="absolute inset-0 pointer-events-none">
           <img 
             src={steeringWheelImage} 
             alt="נוף מתוך הרכב - הגה ודרך"
-            className="w-full h-full object-cover opacity-60"
+            className="w-full h-full object-cover opacity-100 contrast-125 saturate-110"
           />
-          <div className="absolute inset-0 bg-primary/40"></div>
+          <div className="hero-vignette"></div>
           <div className="road-animation"></div>
         </div>
         <div className="relative container mx-auto px-4 py-20 text-center text-primary-foreground">
