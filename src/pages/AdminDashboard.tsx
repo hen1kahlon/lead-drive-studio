@@ -94,6 +94,42 @@ const AdminDashboard = () => {
     loadStudents();
   }, []);
 
+  // Realtime: listen for new leads
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:contact_messages')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'contact_messages',
+      }, (payload) => {
+        const row: any = payload.new;
+        let service: 'driving-lessons' | 'car-rental' = 'driving-lessons';
+        let messageText: string = row.message || '';
+        if (typeof messageText === 'string') {
+          if (messageText.startsWith('השכרת רכב')) service = 'car-rental';
+          else if (messageText.startsWith('שיעורי נהיגה')) service = 'driving-lessons';
+          const idx = messageText.indexOf(':');
+          if (idx !== -1) messageText = messageText.slice(idx + 1).trim();
+        }
+        const lead: Lead = {
+          id: row.id,
+          name: row.name || '',
+          email: row.email || '',
+          phone: row.phone || '',
+          service,
+          message: messageText,
+          createdAt: new Date(row.created_at),
+        };
+        setLeads((prev) => [lead, ...prev]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const loadStudents = async () => {
     try {
       const { data, error } = await supabase
