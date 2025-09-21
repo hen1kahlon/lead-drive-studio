@@ -127,20 +127,20 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="lg"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-red-500 hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/50"
+                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-red-500 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-red-500/50 focus:bg-white/10 active:bg-white/10 focus:scale-100 active:scale-95 focus:rotate-0 active:rotate-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
                 aria-label="Gmail"
               >
-                <AtSign className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#EA4335" />
+                <AtSign className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#EA4335" />
               </Button>
               <Button
                 variant="ghost"
                 size="lg"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-green-500 hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-green-500/50"
+                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-green-500 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-green-500/50 focus:bg-white/10 active:bg-white/10 focus:scale-100 active:scale-95 focus:rotate-0 active:rotate-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <MessageCircle className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#25D366" />
+                <MessageCircle className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#25D366" />
               </Button>
               <Button
                 variant="ghost"
@@ -154,20 +154,20 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="lg"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-blue-600 hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-600/50 focus:bg-white/10 active:bg-white/10 focus:scale-100 active:scale-95 focus:rotate-0 active:rotate-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-blue-600 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-blue-600/50 focus:bg-white/10 active:bg-white/10 focus:scale-100 active:scale-95 focus:rotate-0 active:rotate-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 onClick={(e) => { (e.currentTarget as HTMLButtonElement).blur(); window.open('https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL', '_blank'); }}
                 aria-label="פייסבוק"
               >
-                <Facebook className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#1877F2" />
+                <Facebook className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#1877F2" />
               </Button>
               <Button
                 variant="ghost"
                 size="lg"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/50"
+                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-gradient-to-r md:hover:from-purple-500 md:hover:to-pink-500 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-pink-500/50 focus:bg-white/10 active:bg-white/10 focus:scale-100 active:scale-95 focus:rotate-0 active:rotate-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 onClick={() => window.open('https://instagram.com/hen_driver', '_blank')}
                 aria-label="אינסטגרם"
               >
-                <Instagram className="h-8 w-8 transition-all duration-300 hover:scale-110" color="#E4405F" />
+                <Instagram className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#E4405F" />
               </Button>
             </div>
           </div>
