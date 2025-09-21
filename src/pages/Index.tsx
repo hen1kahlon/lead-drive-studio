@@ -76,7 +76,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden driving-background">
+      <section className="relative bg-primary overflow-hidden driving-background">
         <div className="absolute inset-0 pointer-events-none">
           <img 
             src={steeringWheelImage} 
