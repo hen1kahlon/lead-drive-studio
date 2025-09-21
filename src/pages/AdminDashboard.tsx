@@ -67,18 +67,11 @@ const AdminDashboard = () => {
   }, [isAdmin, navigate]);
 
   useEffect(() => {
-    // Load data from localStorage (in real app, this would come from Supabase)
-    const savedLeads = localStorage.getItem('leads');
+    // Load reviews and settings from localStorage
     const savedReviews = localStorage.getItem('reviews');
     const savedSocialMedia = localStorage.getItem('socialMedia');
     const savedProfile = localStorage.getItem('profileData');
     
-    if (savedLeads) {
-      setLeads(JSON.parse(savedLeads).map((lead: any) => ({
-        ...lead,
-        createdAt: new Date(lead.createdAt)
-      })));
-    }
     if (savedReviews) {
       setReviews(JSON.parse(savedReviews).map((review: any) => ({
         ...review,
@@ -96,7 +89,8 @@ const AdminDashboard = () => {
       setTempProfileData(parsed);
     }
     
-    // Load students from Supabase
+    // Load leads and students from Supabase
+    loadLeads();
     loadStudents();
   }, []);
 
@@ -122,6 +116,45 @@ const AdminDashboard = () => {
         title: "שגיאה",
         description: "שגיאה בטעינת התלמידים",
         variant: "destructive",
+      });
+    }
+  };
+
+  const loadLeads = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const leadsData: Lead[] = (data || []).map((row: any) => {
+        let service: 'driving-lessons' | 'car-rental' = 'driving-lessons';
+        let messageText: string = row.message || '';
+        if (typeof messageText === 'string') {
+          if (messageText.startsWith('השכרת רכב')) service = 'car-rental';
+          else if (messageText.startsWith('שיעורי נהיגה')) service = 'driving-lessons';
+          const idx = messageText.indexOf(':');
+          if (idx !== -1) messageText = messageText.slice(idx + 1).trim();
+        }
+        return {
+          id: row.id,
+          name: row.name || '',
+          email: row.email || '',
+          phone: row.phone || '',
+          service,
+          message: messageText,
+          createdAt: new Date(row.created_at),
+        } as Lead;
+      });
+
+      setLeads(leadsData);
+    } catch (error) {
+      console.error('Error loading leads:', error);
+      toast({
+        title: 'שגיאה',
+        description: 'שגיאה בטעינת הלידים',
+        variant: 'destructive',
       });
     }
   };
@@ -245,10 +278,30 @@ const AdminDashboard = () => {
     }
   };
 
-  const deleteLead = (id: string) => {
-    const updatedLeads = leads.filter(lead => lead.id !== id);
-    setLeads(updatedLeads);
-    localStorage.setItem('leads', JSON.stringify(updatedLeads));
+  const deleteLead = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      const updatedLeads = leads.filter(lead => lead.id !== id);
+      setLeads(updatedLeads);
+
+      toast({
+        title: 'נמחק',
+        description: 'הליד נמחק בהצלחה',
+      });
+    } catch (error) {
+      console.error('Error deleting lead:', error);
+      toast({
+        title: 'שגיאה',
+        description: 'שגיאה במחיקת הליד',
+        variant: 'destructive',
+      });
+    }
   };
 
   const deleteReview = (id: string) => {
