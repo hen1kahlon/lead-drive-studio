@@ -79,7 +79,10 @@ const Index = () => {
 
         // Add reviews for students who passed
         const passedStudents = studentsData.filter(student => student.passed);
-        const currentReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+        const currentReviews = JSON.parse(localStorage.getItem('reviews') || '[]').map((r: any) => ({
+          ...r,
+          createdAt: new Date(r.createdAt)
+        }));
         
         // Check if we already have reviews from these students
         const existingReviewNames = currentReviews.map((r: any) => r.name);
