@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { Lead, Review } from '../types';
@@ -666,75 +667,89 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>שם</TableHead>
-                          <TableHead>טלפון</TableHead>
-                          <TableHead>סטטוס</TableHead>
-                          <TableHead>תיאוריה</TableHead>
-                          <TableHead>מעשי</TableHead>
-                          <TableHead>שיעורים</TableHead>
-                          <TableHead>פעולות</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {students.map((student) => (
-                          <TableRow key={student.id}>
-                            <TableCell className="font-medium">
-                              <div>
-                                <div>{student.name}</div>
-                                {student.email && (
-                                  <div className="text-xs text-muted-foreground">{student.email}</div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>{student.phone || '-'}</TableCell>
-                            <TableCell>
-                              <Badge variant={student.passed ? "default" : "secondary"}>
-                                {student.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => updateStudentStatus(student.id, 'theory_test_passed', !student.theory_test_passed)}
-                                className={student.theory_test_passed ? 'text-green-600' : 'text-gray-400'}
-                              >
-                                {student.theory_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => updateStudentStatus(student.id, 'practical_test_passed', !student.practical_test_passed)}
-                                className={student.practical_test_passed ? 'text-green-600' : 'text-gray-400'}
-                              >
-                                {student.practical_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={student.lessons_completed}
-                                onChange={(e) => updateStudentStatus(student.id, 'lessons_completed', parseInt(e.target.value) || 0)}
-                                className="w-20"
-                                min="0"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => deleteStudent(student.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>שם</TableHead>
+                              <TableHead>טלפון</TableHead>
+                              <TableHead>סטטוס</TableHead>
+                              <TableHead>תיאוריה</TableHead>
+                              <TableHead>מעשי</TableHead>
+                              <TableHead>שיעורים</TableHead>
+                              <TableHead>פעולות</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {students.map((student) => (
+                              <TableRow key={student.id}>
+                                <TableCell className="font-medium">
+                                  <div>
+                                    <div>{student.name}</div>
+                                    {student.email && (
+                                      <div className="text-xs text-muted-foreground">{student.email}</div>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>{student.phone || '-'}</TableCell>
+                                <TableCell>
+                                  <Select
+                                    value={student.passed ? 'passed' : 'learning'}
+                                    onValueChange={(value) => {
+                                      const passed = value === 'passed';
+                                      const status = passed ? 'סיים בהצלחה' : 'בתהליך לימוד';
+                                      updateStudentStatus(student.id, 'passed', passed);
+                                      updateStudentStatus(student.id, 'status', status);
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-32">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="learning">בלימוד</SelectItem>
+                                      <SelectItem value="passed">עבר</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => updateStudentStatus(student.id, 'theory_test_passed', !student.theory_test_passed)}
+                                    className={student.theory_test_passed ? 'text-green-600' : 'text-gray-400'}
+                                  >
+                                    {student.theory_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => updateStudentStatus(student.id, 'practical_test_passed', !student.practical_test_passed)}
+                                    className={student.practical_test_passed ? 'text-green-600' : 'text-gray-400'}
+                                  >
+                                    {student.practical_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={student.lessons_completed}
+                                    onChange={(e) => updateStudentStatus(student.id, 'lessons_completed', parseInt(e.target.value) || 0)}
+                                    className="w-20"
+                                    min="0"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => deleteStudent(student.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
                       </TableBody>
                     </Table>
                   </div>
