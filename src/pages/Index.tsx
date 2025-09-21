@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { MessageCircle, Music, Video, Triangle, Type, Facebook, Instagram, Mail, AtSign, Star, Car, Users, Award, Phone, MapPin, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
@@ -44,6 +45,18 @@ const Index = () => {
       }
     ];
   });
+
+  // Mock data for students
+  const students = [
+    { id: 1, name: 'אבי רוזן', status: 'סיים בהצלחה', year: '2024', passed: true },
+    { id: 2, name: 'מיכל כהן', status: 'בתהליך לימוד', year: '2024', passed: false },
+    { id: 3, name: 'יוסי לוי', status: 'סיים בהצלחה', year: '2023', passed: true },
+    { id: 4, name: 'רות שפירא', status: 'סיים בהצלחה', year: '2024', passed: true },
+    { id: 5, name: 'דני אברהם', status: 'בתהליך לימוד', year: '2024', passed: false },
+    { id: 6, name: 'נעמה גלבוע', status: 'סיים בהצלחה', year: '2023', passed: true },
+    { id: 7, name: 'אלון מזרחי', status: 'סיים בהצלחה', year: '2024', passed: true },
+    { id: 8, name: 'ליאור כהן', status: 'בתהליך לימוד', year: '2024', passed: false }
+  ];
 
   const handleLeadSubmit = (leadData: Omit<Lead, 'id' | 'createdAt'>) => {
     const newLead: Lead = {
@@ -103,10 +116,49 @@ const Index = () => {
                 <Star className="w-5 h-5 mr-2" />
                 {averageRating.toFixed(1)} כוכבים
               </Badge>
-              <Badge variant="secondary" className="px-4 py-2 text-lg">
-                <Users className="w-5 h-5 mr-2" />
-                מאות תלמידים
-              </Badge>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Badge variant="secondary" className="px-4 py-2 text-lg cursor-pointer hover:bg-secondary-foreground hover:text-secondary transition-colors">
+                    <Users className="w-5 h-5 mr-2" />
+                    מאות תלמידים
+                  </Badge>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto bg-background border border-border">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-center">התלמידים שלי</DialogTitle>
+                    <DialogDescription className="text-center">
+                      רשימת התלמידים שלימדתי ומלמד כיום
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 mt-6">
+                    {students.map((student) => (
+                      <div key={student.id} className="flex items-center justify-between p-4 bg-surface rounded-lg border border-border">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${student.passed ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                          <div>
+                            <h4 className="font-semibold text-foreground">{student.name}</h4>
+                            <p className="text-sm text-muted-foreground">{student.status}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-foreground">{student.year}</p>
+                          <p className={`text-xs ${student.passed ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {student.passed ? 'עבר בהצלחה' : 'בלימוד'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 text-center p-4 bg-primary/10 rounded-lg">
+                    <p className="text-primary font-semibold">
+                      סה"כ {students.filter(s => s.passed).length} תלמידים עברו בהצלחה
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {students.filter(s => !s.passed).length} תלמידים נוספים בתהליך לימוד
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="flex justify-center mb-6">
               <Button 
