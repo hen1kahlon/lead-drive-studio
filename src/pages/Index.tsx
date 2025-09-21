@@ -223,15 +223,38 @@ const Index = () => {
     loadStudents();
   }, []);
 
-  const handleLeadSubmit = (leadData: Omit<Lead, 'id' | 'createdAt'>) => {
-    const newLead: Lead = {
-      ...leadData,
-      id: Date.now().toString(),
-      createdAt: new Date()
-    };
-    const updatedLeads = [...leads, newLead];
-    setLeads(updatedLeads);
-    localStorage.setItem('leads', JSON.stringify(updatedLeads));
+  const handleLeadSubmit = async (leadData: Omit<Lead, 'id' | 'createdAt'>) => {
+    try {
+      // Save to Supabase database
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert([{
+          name: leadData.name,
+          email: leadData.email,
+          phone: leadData.phone,
+          message: `${leadData.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב למורים'}: ${leadData.message || ''}`
+        }])
+        .select();
+
+      if (error) {
+        console.error('Error saving lead:', error);
+        return;
+      }
+
+      // Also save to local state for immediate display
+      const newLead: Lead = {
+        ...leadData,
+        id: Date.now().toString(),
+        createdAt: new Date()
+      };
+      const updatedLeads = [...leads, newLead];
+      setLeads(updatedLeads);
+      localStorage.setItem('leads', JSON.stringify(updatedLeads));
+      
+      console.log('Lead saved successfully:', data);
+    } catch (error) {
+      console.error('Error submitting lead:', error);
+    }
   };
 
   const handleReviewSubmit = (reviewData: Omit<Review, 'id' | 'createdAt'>) => {
