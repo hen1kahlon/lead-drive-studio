@@ -127,47 +127,47 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3 hover:scale-110 transition-all duration-300 hover:shadow-lg"
                 onClick={() => window.location.href = 'mailto:hen1kahlon@gmail.com'}
                 aria-label="Gmail"
               >
-                <AtSign className="h-6 w-6" style={{ color: '#EA4335' }} />
+                <AtSign className="h-6 w-6 transition-colors duration-300" style={{ color: '#EA4335' }} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-0 bg-transparent hover:bg-transparent border-none"
+                className="p-3 bg-transparent hover:bg-green-500/20 border-none hover:scale-110 transition-all duration-300 hover:shadow-lg"
                 onClick={() => window.open('https://wa.me/972503250150', '_blank')}
                 aria-label="וואטסאפ"
               >
-                <MessageCircle className="h-6 w-6 text-success" />
+                <MessageCircle className="h-6 w-6 text-green-500 transition-colors duration-300 hover:text-green-400" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3 hover:scale-110 transition-all duration-300 hover:shadow-lg"
                 onClick={() => window.open('https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1', '_blank')}
                 aria-label="טיקטוק"
               >
-                <span className="text-sm font-bold" style={{ color: '#000000' }}>TikTok</span>
+                <span className="text-sm font-bold transition-colors duration-300 hover:text-gray-700" style={{ color: '#000000' }}>TikTok</span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3 hover:scale-110 transition-all duration-300 hover:shadow-lg"
                 onClick={() => window.open('https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL', '_blank')}
                 aria-label="פייסבוק"
               >
-                <Facebook className="h-6 w-6" style={{ color: '#1877F2' }} />
+                <Facebook className="h-6 w-6 transition-colors duration-300 hover:text-blue-400" style={{ color: '#1877F2' }} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-primary-light/20 p-3"
+                className="hover:bg-primary-light/20 p-3 hover:scale-110 transition-all duration-300 hover:shadow-lg"
                 onClick={() => window.open('https://instagram.com/hen_driver', '_blank')}
                 aria-label="אינסטגרם"
               >
-                <Instagram className="h-6 w-6" style={{ color: '#E4405F' }} />
+                <Instagram className="h-6 w-6 transition-colors duration-300 hover:text-pink-400" style={{ color: '#E4405F' }} />
               </Button>
             </div>
           </div>
