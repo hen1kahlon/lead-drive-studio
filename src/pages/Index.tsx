@@ -157,6 +157,16 @@ const Index = () => {
                     <DialogDescription className="text-center">
                       רשימת התלמידים שלימדתי ומלמד כיום
                     </DialogDescription>
+                    <div className="flex justify-center gap-6 mt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <span className="text-sm font-medium">{students.filter(s => s.passed).length} עוברים</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <span className="text-sm font-medium">{students.filter(s => !s.passed).length} לומדים</span>
+                      </div>
+                    </div>
                   </DialogHeader>
                   <div className="grid gap-4 mt-6">
                     {students.length === 0 ? (
@@ -182,14 +192,6 @@ const Index = () => {
                         </div>
                       ))
                     )}
-                  </div>
-                  <div className="mt-6 text-center p-4 bg-primary/10 rounded-lg">
-                    <p className="text-primary font-semibold">
-                      סה"כ {students.filter(s => s.passed).length} תלמידים עברו בהצלחה
-                    </p>
-                    <p className="text-muted-foreground text-sm">
-                      {students.filter(s => !s.passed).length} תלמידים נוספים בתהליך לימוד
-                    </p>
                   </div>
                 </DialogContent>
               </Dialog>
