@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { MessageCircle, Music, Video, Triangle, Type, Facebook, Instagram, Mail,
 import heroImage from '@/assets/hero-driving.jpg';
 import steeringWheelImage from '@/assets/steering-wheel-view.jpg';
 import dashboardImage from '@/assets/dashboard.jpg';
+import { supabase } from '@/integrations/supabase/client';
 
 import LeadForm from '../components/LeadForm';
 import ReviewForm from '../components/ReviewForm';
@@ -16,6 +17,14 @@ import ReviewsList from '../components/ReviewsList';
 import ProfileSection from '../components/ProfileSection';
 import Header from '../components/Header';
 import { Lead, Review } from '../types';
+
+interface Student {
+  id: string;
+  name: string;
+  status: string;
+  year: string;
+  passed: boolean;
+}
 
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>(() => {
@@ -46,17 +55,36 @@ const Index = () => {
     ];
   });
 
-  // Mock data for students
-  const students = [
-    { id: 1, name: 'אבי רוזן', status: 'סיים בהצלחה', year: '2024', passed: true },
-    { id: 2, name: 'מיכל כהן', status: 'בתהליך לימוד', year: '2024', passed: false },
-    { id: 3, name: 'יוסי לוי', status: 'סיים בהצלחה', year: '2023', passed: true },
-    { id: 4, name: 'רות שפירא', status: 'סיים בהצלחה', year: '2024', passed: true },
-    { id: 5, name: 'דני אברהם', status: 'בתהליך לימוד', year: '2024', passed: false },
-    { id: 6, name: 'נעמה גלבוע', status: 'סיים בהצלחה', year: '2023', passed: true },
-    { id: 7, name: 'אלון מזרחי', status: 'סיים בהצלחה', year: '2024', passed: true },
-    { id: 8, name: 'ליאור כהן', status: 'בתהליך לימוד', year: '2024', passed: false }
-  ];
+  const [students, setStudents] = useState<Student[]>([]);
+
+  useEffect(() => {
+    const loadStudents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('students_real')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const studentsData = data?.map(student => ({
+          id: student.id,
+          name: student.name,
+          status: student.status,
+          year: student.year,
+          passed: student.passed
+        })) || [];
+        
+        setStudents(studentsData);
+      } catch (error) {
+        console.error('Error loading students:', error);
+        // Fallback to empty array if there's an error
+        setStudents([]);
+      }
+    };
+
+    loadStudents();
+  }, []);
 
   const handleLeadSubmit = (leadData: Omit<Lead, 'id' | 'createdAt'>) => {
     const newLead: Lead = {
@@ -120,7 +148,7 @@ const Index = () => {
                 <DialogTrigger asChild>
                   <Badge variant="secondary" className="px-4 py-2 text-lg cursor-pointer hover:bg-secondary-foreground hover:text-secondary transition-colors">
                     <Users className="w-5 h-5 mr-2" />
-                    מאות תלמידים
+                    {students.length > 0 ? `${students.length} תלמידים` : 'התלמידים שלי'}
                   </Badge>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto bg-background border border-border">
@@ -131,23 +159,29 @@ const Index = () => {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 mt-6">
-                    {students.map((student) => (
-                      <div key={student.id} className="flex items-center justify-between p-4 bg-surface rounded-lg border border-border">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${student.passed ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                          <div>
-                            <h4 className="font-semibold text-foreground">{student.name}</h4>
-                            <p className="text-sm text-muted-foreground">{student.status}</p>
+                    {students.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        עדיין לא נוספו תלמידים
+                      </div>
+                    ) : (
+                      students.map((student) => (
+                        <div key={student.id} className="flex items-center justify-between p-4 bg-surface rounded-lg border border-border">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${student.passed ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                            <div>
+                              <h4 className="font-semibold text-foreground">{student.name}</h4>
+                              <p className="text-sm text-muted-foreground">{student.status}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-foreground">{student.year}</p>
+                            <p className={`text-xs ${student.passed ? 'text-green-600' : 'text-yellow-600'}`}>
+                              {student.passed ? 'עבר בהצלחה' : 'בלימוד'}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-foreground">{student.year}</p>
-                          <p className={`text-xs ${student.passed ? 'text-green-600' : 'text-yellow-600'}`}>
-                            {student.passed ? 'עבר בהצלחה' : 'בלימוד'}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                   <div className="mt-6 text-center p-4 bg-primary/10 rounded-lg">
                     <p className="text-primary font-semibold">
