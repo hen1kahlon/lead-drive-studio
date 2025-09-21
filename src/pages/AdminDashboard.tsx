@@ -32,15 +32,12 @@ interface ProfileData {
 interface Student {
   id: string;
   name: string;
-  phone?: string;
-  email?: string;
   status: string;
   year: string;
   passed: boolean;
   theory_test_passed: boolean;
   practical_test_passed: boolean;
   lessons_completed: number;
-  notes?: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -59,9 +56,8 @@ const AdminDashboard = () => {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [newStudent, setNewStudent] = useState({
     name: '',
-    phone: '',
-    email: '',
-    notes: ''
+    year: '2024',
+    status: 'בלימוד'
   });
 
   useEffect(() => {
@@ -145,9 +141,9 @@ const AdminDashboard = () => {
         .from('students_real')
         .insert([{
           name: newStudent.name,
-          phone: newStudent.phone || null,
-          email: newStudent.email || null,
-          notes: newStudent.notes || null
+          status: newStudent.status,
+          year: newStudent.year,
+          passed: newStudent.status === 'עבר'
         }])
         .select()
         .single();
@@ -161,7 +157,7 @@ const AdminDashboard = () => {
       };
 
       setStudents([studentData, ...students]);
-      setNewStudent({ name: '', phone: '', email: '', notes: '' });
+      setNewStudent({ name: '', year: '2024', status: 'בלימוד' });
       setShowAddStudent(false);
       
       toast({
@@ -612,32 +608,27 @@ const AdminDashboard = () => {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="studentPhone">טלפון</Label>
-                        <Input
-                          id="studentPhone"
-                          value={newStudent.phone}
-                          onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })}
-                          placeholder="הכנס מספר טלפון"
-                        />
+                        <Label htmlFor="studentStatus">סטטוס</Label>
+                        <Select 
+                          value={newStudent.status}
+                          onValueChange={(value) => setNewStudent({ ...newStudent, status: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="בחר סטטוס" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="בלימוד">בלימוד</SelectItem>
+                            <SelectItem value="עבר">עבר</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
-                        <Label htmlFor="studentEmail">אימייל</Label>
+                        <Label htmlFor="studentYear">שנת לימוד</Label>
                         <Input
-                          id="studentEmail"
-                          type="email"
-                          value={newStudent.email}
-                          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-                          placeholder="הכנס כתובת אימייל"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="studentNotes">הערות</Label>
-                        <Textarea
-                          id="studentNotes"
-                          value={newStudent.notes}
-                          onChange={(e) => setNewStudent({ ...newStudent, notes: e.target.value })}
-                          placeholder="הערות כלליות"
-                          rows={3}
+                          id="studentYear"
+                          value={newStudent.year}
+                          onChange={(e) => setNewStudent({ ...newStudent, year: e.target.value })}
+                          placeholder="הכנס שנת לימוד (למשל 2024)"
                         />
                       </div>
                     </div>
@@ -650,7 +641,7 @@ const AdminDashboard = () => {
                         variant="outline" 
                         onClick={() => {
                           setShowAddStudent(false);
-                          setNewStudent({ name: '', phone: '', email: '', notes: '' });
+                          setNewStudent({ name: '', year: '2024', status: 'בלימוד' });
                         }}
                         className="flex items-center gap-2"
                       >
@@ -671,11 +662,8 @@ const AdminDashboard = () => {
                           <TableHeader>
                             <TableRow>
                               <TableHead>שם</TableHead>
-                              <TableHead>טלפון</TableHead>
                               <TableHead>סטטוס</TableHead>
-                              <TableHead>תיאוריה</TableHead>
-                              <TableHead>מעשי</TableHead>
-                              <TableHead>שיעורים</TableHead>
+                              <TableHead>שנה</TableHead>
                               <TableHead>פעולות</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -683,20 +671,14 @@ const AdminDashboard = () => {
                             {students.map((student) => (
                               <TableRow key={student.id}>
                                 <TableCell className="font-medium">
-                                  <div>
-                                    <div>{student.name}</div>
-                                    {student.email && (
-                                      <div className="text-xs text-muted-foreground">{student.email}</div>
-                                    )}
-                                  </div>
+                                  {student.name}
                                 </TableCell>
-                                <TableCell>{student.phone || '-'}</TableCell>
                                 <TableCell>
                                   <Select
                                     value={student.passed ? 'passed' : 'learning'}
                                     onValueChange={(value) => {
                                       const passed = value === 'passed';
-                                      const status = passed ? 'סיים בהצלחה' : 'בתהליך לימוד';
+                                      const status = passed ? 'עבר' : 'בלימוד';
                                       updateStudentStatus(student.id, 'passed', passed);
                                       updateStudentStatus(student.id, 'status', status);
                                     }}
@@ -711,33 +693,7 @@ const AdminDashboard = () => {
                                   </Select>
                                 </TableCell>
                                 <TableCell>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => updateStudentStatus(student.id, 'theory_test_passed', !student.theory_test_passed)}
-                                    className={student.theory_test_passed ? 'text-green-600' : 'text-gray-400'}
-                                  >
-                                    {student.theory_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                                  </Button>
-                                </TableCell>
-                                <TableCell>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => updateStudentStatus(student.id, 'practical_test_passed', !student.practical_test_passed)}
-                                    className={student.practical_test_passed ? 'text-green-600' : 'text-gray-400'}
-                                  >
-                                    {student.practical_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                                  </Button>
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    type="number"
-                                    value={student.lessons_completed}
-                                    onChange={(e) => updateStudentStatus(student.id, 'lessons_completed', parseInt(e.target.value) || 0)}
-                                    className="w-20"
-                                    min="0"
-                                  />
+                                  {student.year}
                                 </TableCell>
                                 <TableCell>
                                   <Button
