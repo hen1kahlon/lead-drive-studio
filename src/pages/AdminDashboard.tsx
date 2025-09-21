@@ -43,7 +43,7 @@ interface Student {
 }
 
 const AdminDashboard = () => {
-  const { isAdmin } = useAuth();
+  const { user, logout, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -94,8 +94,31 @@ const AdminDashboard = () => {
     loadStudents();
   }, []);
 
+  // Load localStorage data after authentication is confirmed
+  useEffect(() => {
+    if (loading || !user || !isAdmin) return;
+    
+    // Load data from localStorage for Reviews (they're not in Supabase yet)
+    const savedReviews = localStorage.getItem('reviews');
+    if (savedReviews) {
+      setReviews(JSON.parse(savedReviews));
+    }
+    
+    const savedSocialMedia = localStorage.getItem('socialMedia');
+    if (savedSocialMedia) {
+      setSocialMedia(JSON.parse(savedSocialMedia));
+    }
+    
+    const savedProfileData = localStorage.getItem('profileData');
+    if (savedProfileData) {
+      setProfileData(JSON.parse(savedProfileData));
+    }
+  }, [user, isAdmin, loading]);
+
   // Realtime: listen for new leads
   useEffect(() => {
+    if (loading || !user || !isAdmin) return;
+
     const channel = supabase
       .channel('public:contact_messages')
       .on('postgres_changes', {
@@ -128,7 +151,7 @@ const AdminDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user, isAdmin, loading]);
 
   const loadStudents = async () => {
     try {
