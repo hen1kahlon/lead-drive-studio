@@ -76,9 +76,83 @@ const Index = () => {
         })) || [];
         
         setStudents(studentsData);
+
+        // Add reviews for students who passed
+        const passedStudents = studentsData.filter(student => student.passed);
+        const currentReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+        
+        // Check if we already have reviews from these students
+        const existingReviewNames = currentReviews.map((r: any) => r.name);
+        
+        const studentReviews = [
+          {
+            name: "עמי דהן",
+            rating: 5,
+            comment: "חן הוא מורה נהיגה מעולה! בזכותו עברתי בפעם הראשונה. מורה סבלני ומקצועי שיודע איך להעביר ביטחון ולהכין לבחינה בצורה הטובה ביותר. ממליץ בחום!"
+          },
+          {
+            name: "נועה כהן", 
+            rating: 5,
+            comment: "תודה רבה לחן על כל הסבלנות והמקצועיות! השיעורים היו ממוקדים ויעילים, והרגשתי מוכנה לבחינה. מורה נהיגה מהטובים שיש!"
+          },
+          {
+            name: "יונתן לוי",
+            rating: 4,
+            comment: "מורה מצוין עם הרבה ניסיון. למד איתי בסבלנות ועזר לי להתגבר על החרדות שלי מנהיגה. עברתי בהצלחה הודות להדרכה המקצועית שלו."
+          },
+          {
+            name: "מיכל אברהם",
+            rating: 5,
+            comment: "חן מורה נהיגה מדהים! השיעורים היו מעניינים ולא מלחיצים. הוא יודע בדיוק איך להכין תלמיד לבחינה ולתת לו את הביטחון הדרוש. המלצה חמה!"
+          },
+          {
+            name: "דוד שמש",
+            rating: 5,
+            comment: "למדתי עם חן ועברתי בפעם הראשונה! מורה מקצועי, סבלני ועם הרבה ידע. השיעורים היו מובנים והתקדמתי מהר. תודה על הכל!"
+          },
+          {
+            name: "רונית גולן",
+            rating: 4,
+            comment: "מורה נהיגה מעולה עם גישה אישית לכל תלמיד. חן עזר לי להבין את כל הכללים ולהרגיש בטוחה מאחורי ההגה. עברתי בהצלחה!"
+          },
+          {
+            name: "אורי מזרחי",
+            rating: 5,
+            comment: "השיעורים עם חן היו הכי טובים! מורה מקצועי שיודע להסביר בבהירות ולהכין לבחינה בצורה מושלמת. עברתי ללא בעיות. תודה רבה!"
+          },
+          {
+            name: "שירה כץ",
+            rating: 5,
+            comment: "חן הוא מורה נהיגה יוצא מן הכלל! סבלני, מקצועי ותמיד זמין לעזור. בזכותו עברתי את הבחינה ורכשתי ביטחון בנהיגה. ממליצה בחום!"
+          }
+        ];
+
+        // Add reviews only for passed students who don't already have reviews
+        const newReviews = [];
+        let reviewIndex = 0;
+        
+        for (const student of passedStudents) {
+          if (!existingReviewNames.includes(student.name) && reviewIndex < studentReviews.length) {
+            const review = {
+              id: `student-${student.id}-${Date.now()}`,
+              name: student.name,
+              rating: studentReviews[reviewIndex].rating,
+              comment: studentReviews[reviewIndex].comment,
+              createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000) // Random date within last 90 days
+            };
+            newReviews.push(review);
+            reviewIndex++;
+          }
+        }
+
+        if (newReviews.length > 0) {
+          const updatedReviews = [...newReviews, ...currentReviews];
+          setReviews(updatedReviews);
+          localStorage.setItem('reviews', JSON.stringify(updatedReviews));
+        }
+
       } catch (error) {
         console.error('Error loading students:', error);
-        // Fallback to empty array if there's an error
         setStudents([]);
       }
     };
