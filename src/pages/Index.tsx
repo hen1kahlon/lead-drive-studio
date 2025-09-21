@@ -131,16 +131,7 @@ const Index = () => {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 mt-6">
-                    {[
-                      { id: 1, name: 'אבי רוזן', status: 'סיים בהצלחה', year: '2024', passed: true },
-                      { id: 2, name: 'מיכל כהן', status: 'בתהליך לימוד', year: '2024', passed: false },
-                      { id: 3, name: 'יוסי לוי', status: 'סיים בהצלחה', year: '2023', passed: true },
-                      { id: 4, name: 'רות שפירא', status: 'סיים בהצלחה', year: '2024', passed: true },
-                      { id: 5, name: 'דני אברהם', status: 'בתהליך לימוד', year: '2024', passed: false },
-                      { id: 6, name: 'נעמה גלבוע', status: 'סיים בהצלחה', year: '2023', passed: true },
-                      { id: 7, name: 'אלון מזרחי', status: 'סיים בהצלחה', year: '2024', passed: true },
-                      { id: 8, name: 'ליאור כהן', status: 'בתהליך לימוד', year: '2024', passed: false }
-                    ].map((student) => (
+                    {students.map((student) => (
                       <div key={student.id} className="flex items-center justify-between p-4 bg-surface rounded-lg border border-border">
                         <div className="flex items-center gap-3">
                           <div className={`w-3 h-3 rounded-full ${student.passed ? 'bg-green-500' : 'bg-yellow-500'}`} />
@@ -160,28 +151,10 @@ const Index = () => {
                   </div>
                   <div className="mt-6 text-center p-4 bg-primary/10 rounded-lg">
                     <p className="text-primary font-semibold">
-                      סה"כ {[
-                        { id: 1, name: 'אבי רוזן', status: 'סיים בהצלחה', year: '2024', passed: true },
-                        { id: 2, name: 'מיכל כהן', status: 'בתהליך לימוד', year: '2024', passed: false },
-                        { id: 3, name: 'יוסי לוי', status: 'סיים בהצלחה', year: '2023', passed: true },
-                        { id: 4, name: 'רות שפירא', status: 'סיים בהצלחה', year: '2024', passed: true },
-                        { id: 5, name: 'דני אברהם', status: 'בתהליך לימוד', year: '2024', passed: false },
-                        { id: 6, name: 'נעמה גלבוע', status: 'סיים בהצלחה', year: '2023', passed: true },
-                        { id: 7, name: 'אלון מזרחי', status: 'סיים בהצלחה', year: '2024', passed: true },
-                        { id: 8, name: 'ליאור כהן', status: 'בתהליך לימוד', year: '2024', passed: false }
-                      ].filter(s => s.passed).length} תלמידים עברו בהצלחה
+                      סה"כ {students.filter(s => s.passed).length} תלמידים עברו בהצלחה
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      {[
-                        { id: 1, name: 'אבי רוזן', status: 'סיים בהצלחה', year: '2024', passed: true },
-                        { id: 2, name: 'מיכל כהן', status: 'בתהליך לימוד', year: '2024', passed: false },
-                        { id: 3, name: 'יוסי לוי', status: 'סיים בהצלחה', year: '2023', passed: true },
-                        { id: 4, name: 'רות שפירא', status: 'סיים בהצלחה', year: '2024', passed: true },
-                        { id: 5, name: 'דני אברהם', status: 'בתהליך לימוד', year: '2024', passed: false },
-                        { id: 6, name: 'נעמה גלבוע', status: 'סיים בהצלחה', year: '2023', passed: true },
-                        { id: 7, name: 'אלון מזרחי', status: 'סיים בהצלחה', year: '2024', passed: true },
-                        { id: 8, name: 'ליאור כהן', status: 'בתהליך לימוד', year: '2024', passed: false }
-                      ].filter(s => !s.passed).length} תלמידים נוספים בתהליך לימוד
+                      {students.filter(s => !s.passed).length} תלמידים נוספים בתהליך לימוד
                     </p>
                   </div>
                 </DialogContent>
