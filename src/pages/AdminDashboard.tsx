@@ -11,7 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { Lead, Review } from '../types';
-import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera, Music } from 'lucide-react';
+import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera, Music, Plus, Edit2, Check, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import Header from '../components/Header';
 import * as XLSX from 'xlsx';
 
@@ -27,6 +28,22 @@ interface ProfileData {
   description?: string;
 }
 
+interface Student {
+  id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  status: string;
+  year: string;
+  passed: boolean;
+  theory_test_passed: boolean;
+  practical_test_passed: boolean;
+  lessons_completed: number;
+  notes?: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -37,6 +54,14 @@ const AdminDashboard = () => {
   const [tempSocialMedia, setTempSocialMedia] = useState<SocialMedia>({});
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [tempProfileData, setTempProfileData] = useState<ProfileData>({});
+  const [students, setStudents] = useState<Student[]>([]);
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [newStudent, setNewStudent] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    notes: ''
+  });
 
   useEffect(() => {
     if (!isAdmin) {
@@ -73,7 +98,155 @@ const AdminDashboard = () => {
       setProfileData(parsed);
       setTempProfileData(parsed);
     }
+    
+    // Load students from Supabase
+    loadStudents();
   }, []);
+
+  const loadStudents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('students_real')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const studentsData = data?.map(student => ({
+        ...student,
+        created_at: new Date(student.created_at),
+        updated_at: new Date(student.updated_at)
+      })) || [];
+      
+      setStudents(studentsData);
+    } catch (error) {
+      console.error('Error loading students:', error);
+      toast({
+        title: "שגיאה",
+        description: "שגיאה בטעינת התלמידים",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const addStudent = async () => {
+    if (!newStudent.name.trim()) {
+      toast({
+        title: "שגיאה",
+        description: "שם התלמיד הוא שדה חובה",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('students_real')
+        .insert([{
+          name: newStudent.name,
+          phone: newStudent.phone || null,
+          email: newStudent.email || null,
+          notes: newStudent.notes || null
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const studentData: Student = {
+        ...data,
+        created_at: new Date(data.created_at),
+        updated_at: new Date(data.updated_at)
+      };
+
+      setStudents([studentData, ...students]);
+      setNewStudent({ name: '', phone: '', email: '', notes: '' });
+      setShowAddStudent(false);
+      
+      toast({
+        title: "הצלחה",
+        description: "התלמיד נוסף בהצלחה",
+      });
+    } catch (error) {
+      console.error('Error adding student:', error);
+      toast({
+        title: "שגיאה",
+        description: "שגיאה בהוספת התלמיד",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateStudentStatus = async (id: string, field: string, value: any) => {
+    try {
+      const updateData: any = { [field]: value };
+      
+      // Update status based on test results
+      if (field === 'theory_test_passed' || field === 'practical_test_passed') {
+        const student = students.find(s => s.id === id);
+        if (student) {
+          const updatedStudent = { ...student, [field]: value };
+          if (updatedStudent.theory_test_passed && updatedStudent.practical_test_passed) {
+            updateData.status = 'סיים בהצלחה';
+            updateData.passed = true;
+          } else {
+            updateData.status = 'בתהליך לימוד';
+            updateData.passed = false;
+          }
+        }
+      }
+
+      const { error } = await supabase
+        .from('students_real')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setStudents(students.map(student => 
+        student.id === id 
+          ? { ...student, ...updateData, updated_at: new Date() }
+          : student
+      ));
+
+      toast({
+        title: "הצלחה",
+        description: "הנתונים עודכנו בהצלחה",
+      });
+    } catch (error) {
+      console.error('Error updating student:', error);
+      toast({
+        title: "שגיאה",
+        description: "שגיאה בעדכון הנתונים",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteStudent = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('students_real')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setStudents(students.filter(student => student.id !== id));
+      
+      toast({
+        title: "הצלחה",
+        description: "התלמיד נמחק בהצלחה",
+      });
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      toast({
+        title: "שגיאה",
+        description: "שגיאה במחיקת התלמיד",
+        variant: "destructive",
+      });
+    }
+  };
 
   const deleteLead = (id: string) => {
     const updatedLeads = leads.filter(lead => lead.id !== id);
@@ -227,7 +400,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="leads" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 h-auto p-1">
             <TabsTrigger value="leads" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Users className="w-5 h-5" />
               <span className="text-xs sm:text-sm font-medium">לידים</span>
@@ -235,6 +408,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="reviews" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               <MessageSquare className="w-5 h-5" />
               <span className="text-xs sm:text-sm font-medium">ביקורות</span>
+            </TabsTrigger>
+            <TabsTrigger value="students" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-success data-[state=active]:text-success-foreground">
+              <Users className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">תלמידים</span>
             </TabsTrigger>
             <TabsTrigger value="profile" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-success data-[state=active]:text-success-foreground">
               <User className="w-5 h-5" />
@@ -391,6 +568,175 @@ const AdminDashboard = () => {
                         </CardContent>
                       </Card>
                     ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="students">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      ניהול תלמידים
+                    </CardTitle>
+                    <CardDescription>
+                      כל התלמידים שלך - נוכחיים ובוגרים
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    onClick={() => setShowAddStudent(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    הוסף תלמיד
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {showAddStudent && (
+                  <div className="mb-6 p-4 bg-muted rounded-lg">
+                    <h3 className="text-lg font-semibold mb-4">הוסף תלמיד חדש</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="studentName">שם מלא *</Label>
+                        <Input
+                          id="studentName"
+                          value={newStudent.name}
+                          onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                          placeholder="הכנס שם מלא"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="studentPhone">טלפון</Label>
+                        <Input
+                          id="studentPhone"
+                          value={newStudent.phone}
+                          onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })}
+                          placeholder="הכנס מספר טלפון"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="studentEmail">אימייל</Label>
+                        <Input
+                          id="studentEmail"
+                          type="email"
+                          value={newStudent.email}
+                          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                          placeholder="הכנס כתובת אימייל"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="studentNotes">הערות</Label>
+                        <Textarea
+                          id="studentNotes"
+                          value={newStudent.notes}
+                          onChange={(e) => setNewStudent({ ...newStudent, notes: e.target.value })}
+                          placeholder="הערות כלליות"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <Button onClick={addStudent} className="flex items-center gap-2">
+                        <Check className="w-4 h-4" />
+                        שמור
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setShowAddStudent(false);
+                          setNewStudent({ name: '', phone: '', email: '', notes: '' });
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        ביטול
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {students.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    עדיין לא נוספו תלמידים
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>שם</TableHead>
+                          <TableHead>טלפון</TableHead>
+                          <TableHead>סטטוס</TableHead>
+                          <TableHead>תיאוריה</TableHead>
+                          <TableHead>מעשי</TableHead>
+                          <TableHead>שיעורים</TableHead>
+                          <TableHead>פעולות</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {students.map((student) => (
+                          <TableRow key={student.id}>
+                            <TableCell className="font-medium">
+                              <div>
+                                <div>{student.name}</div>
+                                {student.email && (
+                                  <div className="text-xs text-muted-foreground">{student.email}</div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>{student.phone || '-'}</TableCell>
+                            <TableCell>
+                              <Badge variant={student.passed ? "default" : "secondary"}>
+                                {student.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateStudentStatus(student.id, 'theory_test_passed', !student.theory_test_passed)}
+                                className={student.theory_test_passed ? 'text-green-600' : 'text-gray-400'}
+                              >
+                                {student.theory_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                              </Button>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateStudentStatus(student.id, 'practical_test_passed', !student.practical_test_passed)}
+                                className={student.practical_test_passed ? 'text-green-600' : 'text-gray-400'}
+                              >
+                                {student.practical_test_passed ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                              </Button>
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                value={student.lessons_completed}
+                                onChange={(e) => updateStudentStatus(student.id, 'lessons_completed', parseInt(e.target.value) || 0)}
+                                className="w-20"
+                                min="0"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => deleteStudent(student.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 )}
               </CardContent>

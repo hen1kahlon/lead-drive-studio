@@ -297,6 +297,54 @@ export type Database = {
           },
         ]
       }
+      students_real: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          lessons_completed: number
+          name: string
+          notes: string | null
+          passed: boolean
+          phone: string | null
+          practical_test_passed: boolean
+          status: string
+          theory_test_passed: boolean
+          updated_at: string
+          year: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          lessons_completed?: number
+          name: string
+          notes?: string | null
+          passed?: boolean
+          phone?: string | null
+          practical_test_passed?: boolean
+          status?: string
+          theory_test_passed?: boolean
+          updated_at?: string
+          year?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          lessons_completed?: number
+          name?: string
+          notes?: string | null
+          passed?: boolean
+          phone?: string | null
+          practical_test_passed?: boolean
+          status?: string
+          theory_test_passed?: boolean
+          updated_at?: string
+          year?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
