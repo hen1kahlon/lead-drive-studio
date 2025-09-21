@@ -123,49 +123,49 @@ const Index = () => {
             </div>
             
             {/* Social Media Icons */}
-            <div className="flex justify-center gap-6">
+            <div className="flex justify-center flex-wrap gap-3 md:gap-6">
               <a
                 href="mailto:hen1kahlon@gmail.com"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-red-500 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-red-500/50 inline-flex items-center justify-center"
+                className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-red-500 transition-all duration-300 inline-flex items-center justify-center md:hover:scale-110 md:hover:shadow-xl md:hover:shadow-red-500/40"
                 aria-label="Gmail"
               >
-                <AtSign className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#EA4335" />
+                <AtSign className="h-6 w-6 md:h-8 md:w-8" color="#EA4335" />
               </a>
               <a
                 href="https://wa.me/972503250150"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-green-500 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-green-500/50 inline-flex items-center justify-center"
+                className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-green-500 transition-all duration-300 inline-flex items-center justify-center md:hover:scale-110 md:hover:shadow-xl md:hover:shadow-green-500/40"
                 aria-label="וואטסאפ"
               >
-                <MessageCircle className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#25D366" />
+                <MessageCircle className="h-6 w-6 md:h-8 md:w-8" color="#25D366" />
               </a>
               <a
                 href="https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 bg-white/30 backdrop-blur-sm border border-white/40 rounded-full md:hover:bg-white md:hover:text-black md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-white/50 inline-flex items-center justify-center"
+                className="w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full md:hover:bg-white transition-all duration-300 inline-flex items-center justify-center md:hover:scale-110 md:hover:shadow-xl md:hover:shadow-white/40"
                 aria-label="טיקטוק"
               >
-                <span className="text-lg font-bold text-white transition-all duration-300 md:hover:scale-110">TikTok</span>
+                <span className="text-[10px] md:text-sm font-bold text-white md:group-hover:text-black">TikTok</span>
               </a>
               <a
                 href="https://www.facebook.com/profile.php?id=61554332618880&mibextid=ZbWKwL"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-blue-600 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-blue-600/50 inline-flex items-center justify-center"
+                className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-blue-600 transition-all duration-300 inline-flex items-center justify-center md:hover:scale-110 md:hover:shadow-xl md:hover:shadow-blue-600/40"
                 aria-label="פייסבוק"
               >
-                <Facebook className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#1877F2" />
+                <Facebook className="h-6 w-6 md:h-8 md:w-8" color="#1877F2" />
               </a>
               <a
                 href="https://instagram.com/hen_driver"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-gradient-to-r md:hover:from-purple-500 md:hover:to-pink-500 md:hover:scale-125 md:hover:rotate-6 transition-all duration-500 md:hover:shadow-2xl md:hover:shadow-pink-500/50 inline-flex items-center justify-center"
+                className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full md:hover:bg-gradient-to-r md:hover:from-purple-500 md:hover:to-pink-500 transition-all duration-300 inline-flex items-center justify-center md:hover:scale-110 md:hover:shadow-xl md:hover:shadow-pink-500/40"
                 aria-label="אינסטגרם"
               >
-                <Instagram className="h-8 w-8 transition-all duration-300 md:hover:scale-110" color="#E4405F" />
+                <Instagram className="h-6 w-6 md:h-8 md:w-8" color="#E4405F" />
               </a>
             </div>
           </div>
