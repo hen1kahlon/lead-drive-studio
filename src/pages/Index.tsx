@@ -145,11 +145,11 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="lg"
-                className="p-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full hover:bg-white hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-white/50"
+                className="p-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full hover:bg-white hover:text-black hover:scale-125 hover:rotate-6 transition-all duration-500 hover:shadow-2xl hover:shadow-white/50 focus:bg-white/20 focus:text-white active:bg-white/20 active:text-white"
                 onClick={() => window.open('https://www.tiktok.com/@hen_driver?_t=8oOXewPWjMm&_r=1', '_blank')}
                 aria-label="טיקטוק"
               >
-                <span className="text-lg font-bold transition-all duration-300 hover:scale-110 hover:text-black" style={{ color: '#FFFFFF' }}>TikTok</span>
+                <span className="text-lg font-bold text-white transition-all duration-300 hover:scale-110">TikTok</span>
               </Button>
               <Button
                 variant="ghost"
