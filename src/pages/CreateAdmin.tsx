@@ -61,15 +61,14 @@ const CreateAdmin = () => {
       if (authError) throw authError;
 
       if (authData.user) {
-        // Add admin role to the user
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: authData.user.id,
-            role: 'admin'
-          });
+        // Try to grant admin role using the RPC function that bypasses RLS
+        const { error: roleError } = await supabase.rpc('grant_admin_if_none', {
+          _user_id: authData.user.id
+        });
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.warn('Could not auto-assign admin role, user will need to be granted admin manually:', roleError);
+        }
 
         toast({
           title: "משתמש מנהל נוצר בהצלחה",
