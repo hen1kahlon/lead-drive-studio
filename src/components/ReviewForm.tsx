@@ -61,52 +61,54 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-lg">
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">השאר ביקורת</CardTitle>
-        <CardDescription>
+    <Card className="w-full max-w-lg mx-auto shadow-md border-0 bg-background/95 backdrop-blur">
+      <CardHeader className="text-center pb-4">
+        <CardTitle className="text-2xl font-bold text-primary">השאר ביקורת</CardTitle>
+        <CardDescription className="text-muted-foreground">
           שתף את החוויה שלך עם חן כחלון
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="reviewName" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              שם
+      <CardContent className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="reviewName" className="text-base font-medium flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              שם מלא *
             </Label>
             <Input
               id="reviewName"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="הכנס את שמך"
+              placeholder="הכנס את שמך המלא"
+              className="h-12 text-base border-2 focus:border-primary"
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>דירוג</Label>
-            <div className="flex items-center gap-1">
+          <div className="space-y-3">
+            <Label className="text-base font-medium">דירוג השירות</Label>
+            <div className="flex items-center gap-2 justify-center p-4 bg-muted/50 rounded-lg">
               {renderStars()}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="comment" className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4" />
-              ביקורת
+          <div className="space-y-3">
+            <Label htmlFor="comment" className="text-base font-medium flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              הודעה נוספת
             </Label>
             <Textarea
               id="comment"
               value={formData.comment}
               onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-              placeholder="ספר לנו על החוויה שלך..."
+              placeholder="ספר לנו עוד על הצרכים שלך..."
               rows={4}
+              className="text-base border-2 focus:border-primary resize-none"
               required
             />
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
             שלח ביקורת
           </Button>
         </form>
