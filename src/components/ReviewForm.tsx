@@ -16,7 +16,8 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     rating: 5,
-    comment: ''
+    comment: '',
+    serviceType: 'driving' // 'driving' for שיעורי נהיגה, 'rental' for השכרת רכב
   });
   const { toast } = useToast();
 
@@ -36,7 +37,8 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
     setFormData({
       name: '',
       rating: 5,
-      comment: ''
+      comment: '',
+      serviceType: 'driving'
     });
 
     toast({
@@ -83,6 +85,36 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
               className="h-12 text-base border-2 focus:border-primary"
               required
             />
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-medium">סוג השירות</Label>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                <input
+                  type="radio"
+                  id="driving"
+                  name="serviceType"
+                  value="driving"
+                  checked={formData.serviceType === 'driving'}
+                  onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
+                  className="h-4 w-4 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="driving" className="cursor-pointer text-base">שיעורי נהיגה</Label>
+              </div>
+              <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                <input
+                  type="radio"
+                  id="rental"
+                  name="serviceType"
+                  value="rental"
+                  checked={formData.serviceType === 'rental'}
+                  onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
+                  className="h-4 w-4 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="rental" className="cursor-pointer text-base">השכרת רכב למורים</Label>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3">
