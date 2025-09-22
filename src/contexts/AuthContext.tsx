@@ -38,14 +38,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setSession(session);
       setUser(session?.user ?? null);
       
-      // Check if user is admin when auth state changes (defer to avoid deadlocks)
+      // Check if user is admin when auth state changes
       if (session?.user) {
+        // Use maybeSingle() instead of single() to handle no role case
         setTimeout(async () => {
           try {
+            // First, try to create admin role if none exists
+            await supabase.rpc('grant_admin_if_none', { _user_id: session.user.id });
+            
             const { data: roles, error } = await supabase
               .from('user_roles')
               .select('role')
               .eq('user_id', session.user.id);
+            
             if (error) throw error;
             setIsAdmin(!!roles?.some((r: any) => r.role === 'admin'));
           } catch (error) {
@@ -70,6 +75,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (session?.user) {
         setTimeout(async () => {
           try {
+            // First, try to create admin role if none exists
+            await supabase.rpc('grant_admin_if_none', { _user_id: session.user.id });
+            
             const { data: roles, error } = await supabase
               .from('user_roles')
               .select('role')
