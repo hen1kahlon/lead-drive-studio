@@ -133,7 +133,7 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
                     onChange={(e) => setFormData({ ...formData, licenseType: e.target.value })}
                     className="h-4 w-4 text-primary focus:ring-primary"
                   />
-                  <Label htmlFor="licenseB" className="cursor-pointer text-sm">B עד 3500 ק"ג אוטומט</Label>
+                  <Label htmlFor="licenseB" className="cursor-pointer text-sm">B (אוטומט)</Label>
                 </div>
                 <div className="flex items-center space-x-3 rtl:space-x-reverse">
                   <input
