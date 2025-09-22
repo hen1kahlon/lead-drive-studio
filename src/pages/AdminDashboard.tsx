@@ -101,7 +101,10 @@ const AdminDashboard = () => {
     // Load data from localStorage for Reviews (they're not in Supabase yet)
     const savedReviews = localStorage.getItem('reviews');
     if (savedReviews) {
-      setReviews(JSON.parse(savedReviews));
+      setReviews(JSON.parse(savedReviews).map((review: any) => ({
+        ...review,
+        createdAt: new Date(review.createdAt)
+      })));
     }
     
     const savedSocialMedia = localStorage.getItem('socialMedia');
@@ -393,7 +396,7 @@ const AdminDashboard = () => {
       'שם': review.name,
       'דירוג': review.rating,
       'הערה': review.comment,
-      'תאריך': review.createdAt.toLocaleDateString('he-IL')
+      'תאריך': review.createdAt instanceof Date ? review.createdAt.toLocaleDateString('he-IL') : new Date(review.createdAt).toLocaleDateString('he-IL')
     }));
     exportToExcel(reviewsData, 'ביקורות', 'ביקורות');
   };
@@ -667,7 +670,7 @@ const AdminDashboard = () => {
                                   {renderStars(review.rating)}
                                 </div>
                                 <span className="text-sm text-muted-foreground">
-                                  {review.createdAt.toLocaleDateString('he-IL')}
+                                  {review.createdAt instanceof Date ? review.createdAt.toLocaleDateString('he-IL') : new Date(review.createdAt).toLocaleDateString('he-IL')}
                                 </span>
                               </div>
                               <p className="text-foreground">{review.comment}</p>
