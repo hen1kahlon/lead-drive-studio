@@ -187,14 +187,25 @@ const AdminDashboard = () => {
       
       if (rolesError) throw rolesError;
       
+      // Group roles by user_id and get the highest priority role
+      const userRoleMap = new Map<string, any>();
+      const rolePriority = { 'admin': 3, 'instructor': 2, 'user': 1 };
+      
+      for (const role of rolesData || []) {
+        const existing = userRoleMap.get(role.user_id);
+        if (!existing || rolePriority[role.role as keyof typeof rolePriority] > rolePriority[existing.role as keyof typeof rolePriority]) {
+          userRoleMap.set(role.user_id, role);
+        }
+      }
+      
       // Then get profiles for each user
       const enrichedRoles: UserRole[] = [];
       
-      for (const role of rolesData || []) {
+      for (const [userId, role] of userRoleMap) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('first_name, last_name')
-          .eq('user_id', role.user_id)
+          .eq('user_id', userId)
           .single();
           
         enrichedRoles.push({
@@ -577,12 +588,23 @@ const AdminDashboard = () => {
 
   const changeUserRole = async (userId: string, newRole: 'admin' | 'instructor' | 'student' | 'user') => {
     try {
-      const { error } = await supabase
+      // First delete all existing roles for this user
+      const { error: deleteError } = await supabase
         .from('user_roles')
-        .update({ role: newRole })
+        .delete()
         .eq('user_id', userId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
+
+      // Then insert the new role
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: userId,
+          role: newRole
+        });
+
+      if (insertError) throw insertError;
 
       toast({
         title: "הצלחה",
