@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -22,7 +23,7 @@ interface UserRole {
   first_name?: string;
   last_name?: string;
 }
-import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera, Music, Plus, Edit2, Check, X } from 'lucide-react';
+import { Users, MessageSquare, Settings, Trash2, Mail, Phone, Calendar, Star, Download, Facebook, Instagram, MessageCircle, Save, Shield, Key, User, Upload, Camera, Music, Plus, Edit2, Check, X, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '../components/Header';
 import * as XLSX from 'xlsx';
@@ -75,6 +76,9 @@ const AdminDashboard = () => {
   const [newAdminPassword, setNewAdminPassword] = useState('');
   const [newAdminFirstName, setNewAdminFirstName] = useState('');
   const [newAdminLastName, setNewAdminLastName] = useState('');
+  
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isLeadDialogOpen, setIsLeadDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -754,61 +758,220 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>שם</TableHead>
-                          <TableHead>אימייל</TableHead>
-                          <TableHead>טלפון</TableHead>
-                          <TableHead>סוג שירות</TableHead>
-                          <TableHead>תאריך</TableHead>
-                          <TableHead>פעולות</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {leads.map((lead) => (
-                          <TableRow key={lead.id}>
-                            <TableCell className="font-medium">{lead.name}</TableCell>
-                            <TableCell>
-                              <a href={`mailto:${lead.email}`} className="flex items-center gap-1 text-primary hover:underline">
-                                <Mail className="w-4 h-4" />
-                                {lead.email}
-                              </a>
-                            </TableCell>
-                            <TableCell>
-                              <a href={`tel:${lead.phone}`} className="flex items-center gap-1 text-primary hover:underline">
-                                <Phone className="w-4 h-4" />
-                                {lead.phone}
-                              </a>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={lead.service === 'driving-lessons' ? 'default' : 'secondary'}>
-                                {lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                {lead.createdAt.toLocaleDateString('he-IL')}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => deleteLead(lead.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                     <Table>
+                       <TableHeader>
+                         <TableRow>
+                           <TableHead>שם</TableHead>
+                           <TableHead>אימייל</TableHead>
+                           <TableHead>טלפון</TableHead>
+                           <TableHead>סוג שירות</TableHead>
+                           <TableHead>הודעה</TableHead>
+                           <TableHead>תאריך</TableHead>
+                           <TableHead>פעולות</TableHead>
+                         </TableRow>
+                       </TableHeader>
+                       <TableBody>
+                         {leads.map((lead) => (
+                           <TableRow 
+                             key={lead.id}
+                             className="cursor-pointer hover:bg-muted/50"
+                             onClick={() => {
+                               setSelectedLead(lead);
+                               setIsLeadDialogOpen(true);
+                             }}
+                           >
+                             <TableCell className="font-medium">{lead.name}</TableCell>
+                             <TableCell>
+                               <a 
+                                 href={`mailto:${lead.email}`} 
+                                 className="flex items-center gap-1 text-primary hover:underline"
+                                 onClick={(e) => e.stopPropagation()}
+                               >
+                                 <Mail className="w-4 h-4" />
+                                 {lead.email}
+                               </a>
+                             </TableCell>
+                             <TableCell>
+                               <a 
+                                 href={`tel:${lead.phone}`} 
+                                 className="flex items-center gap-1 text-primary hover:underline"
+                                 onClick={(e) => e.stopPropagation()}
+                               >
+                                 <Phone className="w-4 h-4" />
+                                 {lead.phone}
+                               </a>
+                             </TableCell>
+                             <TableCell>
+                               <Badge variant={lead.service === 'driving-lessons' ? 'default' : 'secondary'}>
+                                 {lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
+                               </Badge>
+                             </TableCell>
+                             <TableCell className="max-w-xs">
+                               <div className="truncate text-sm text-muted-foreground">
+                                 {lead.message && lead.message.length > 50 
+                                   ? `${lead.message.substring(0, 50)}...` 
+                                   : lead.message || 'אין הודעה'}
+                               </div>
+                             </TableCell>
+                             <TableCell>
+                               <div className="flex items-center gap-1">
+                                 <Calendar className="w-4 h-4" />
+                                 {lead.createdAt.toLocaleDateString('he-IL')}
+                               </div>
+                             </TableCell>
+                             <TableCell>
+                               <div className="flex gap-2">
+                                 <Button
+                                   variant="outline"
+                                   size="sm"
+                                   onClick={(e) => {
+                                     e.stopPropagation();
+                                     setSelectedLead(lead);
+                                     setIsLeadDialogOpen(true);
+                                   }}
+                                 >
+                                   <Eye className="w-4 h-4" />
+                                 </Button>
+                                 <Button
+                                   variant="destructive"
+                                   size="sm"
+                                   onClick={(e) => {
+                                     e.stopPropagation();
+                                     deleteLead(lead.id);
+                                   }}
+                                 >
+                                   <Trash2 className="w-4 h-4" />
+                                 </Button>
+                               </div>
+                             </TableCell>
+                           </TableRow>
+                         ))}
+                       </TableBody>
+                     </Table>
                   </div>
                 )}
               </CardContent>
             </Card>
+            
+            {/* Lead Details Dialog */}
+            <Dialog open={isLeadDialogOpen} onOpenChange={setIsLeadDialogOpen}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    פרטי הליד
+                  </DialogTitle>
+                  <DialogDescription>
+                    צפה בכל הפרטים שהליד שלח
+                  </DialogDescription>
+                </DialogHeader>
+                
+                {selectedLead && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="text-sm font-medium text-muted-foreground">שם מלא</Label>
+                          <p className="text-lg font-semibold">{selectedLead.name}</p>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm font-medium text-muted-foreground">אימייל</Label>
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-primary" />
+                            <a 
+                              href={`mailto:${selectedLead.email}`} 
+                              className="text-primary hover:underline"
+                            >
+                              {selectedLead.email}
+                            </a>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm font-medium text-muted-foreground">טלפון</Label>
+                          <div className="flex items-center gap-2">
+                            <Phone className="w-4 h-4 text-primary" />
+                            <a 
+                              href={`tel:${selectedLead.phone}`} 
+                              className="text-primary hover:underline"
+                            >
+                              {selectedLead.phone}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="text-sm font-medium text-muted-foreground">סוג שירות</Label>
+                          <div>
+                            <Badge variant={selectedLead.service === 'driving-lessons' ? 'default' : 'secondary'} className="text-base">
+                              {selectedLead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm font-medium text-muted-foreground">תאריך פנייה</Label>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>{selectedLead.createdAt.toLocaleDateString('he-IL')}</span>
+                            <span className="text-muted-foreground">
+                              {selectedLead.createdAt.toLocaleTimeString('he-IL', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {selectedLead.message && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-muted-foreground">הודעה מלאה</Label>
+                        <div className="bg-muted/50 rounded-lg p-4 border">
+                          <p className="text-foreground whitespace-pre-wrap">
+                            {selectedLead.message}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between pt-4 border-t">
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline"
+                          onClick={() => window.open(`mailto:${selectedLead.email}`, '_blank')}
+                        >
+                          <Mail className="w-4 h-4 mr-2" />
+                          שלח מייל
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => window.open(`tel:${selectedLead.phone}`, '_blank')}
+                        >
+                          <Phone className="w-4 h-4 mr-2" />
+                          התקשר
+                        </Button>
+                      </div>
+                      
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          deleteLead(selectedLead.id);
+                          setIsLeadDialogOpen(false);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        מחק ליד
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           <TabsContent value="reviews">
