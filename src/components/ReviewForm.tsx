@@ -120,8 +120,8 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
           </div>
 
           {formData.serviceType === 'driving' && (
-            <div className="space-y-3">
-              <Label className="text-base font-medium">דרגת רישיון נהיגה</Label>
+            <div className="space-y-3 border-t pt-4 mt-4">
+              <Label className="text-base font-medium text-primary">דרגת רישיון נהיגה</Label>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center space-x-3 rtl:space-x-reverse">
                   <input
