@@ -161,7 +161,6 @@ const AdminDashboard = () => {
         const leadsWithTypes = data.map(item => ({
           id: item.id,
           name: item.name,
-          email: item.email || '',
           phone: item.phone || '',
           message: item.message || '',
           service: item.message?.includes('השכרת רכב') ? 'car-rental' as const : 'driving-lessons' as const,
