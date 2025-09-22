@@ -49,14 +49,16 @@ interface Student {
   theory_test_passed: boolean;
   practical_test_passed: boolean;
   lessons_completed: number;
-  created_at: Date;
-  updated_at: Date;
+  phone?: string;
+  email?: string;
+  notes?: string;
 }
 
 const AdminDashboard = () => {
-  const { user, logout, isAdmin, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
   const [leads, setLeads] = useState<Lead[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [pendingTestimonials, setPendingTestimonials] = useState<any[]>([]);
@@ -122,67 +124,92 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (loading || !user || !isAdmin) return;
     
-    // Load data from localStorage for Reviews (they're not in Supabase yet)
-    const savedReviews = localStorage.getItem('reviews');
-    if (savedReviews) {
-      setReviews(JSON.parse(savedReviews).map((review: any) => ({
-        ...review,
-        createdAt: new Date(review.createdAt)
-      })));
-    }
-    
-    const savedSocialMedia = localStorage.getItem('socialMedia');
-    if (savedSocialMedia) {
-      setSocialMedia(JSON.parse(savedSocialMedia));
-    }
-    
-    const savedProfileData = localStorage.getItem('profileData');
-    if (savedProfileData) {
-      setProfileData(JSON.parse(savedProfileData));
-    }
-  }, [user, isAdmin, loading]);
-
-  // Realtime: listen for new leads
-  useEffect(() => {
-    if (loading || !user || !isAdmin) return;
-
-    const channel = supabase
-      .channel('public:contact_messages')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'contact_messages',
-      }, (payload) => {
-        const row: any = payload.new;
-        let service: 'driving-lessons' | 'car-rental' = 'driving-lessons';
-        let messageText: string = row.message || '';
-        if (typeof messageText === 'string') {
-          if (messageText.startsWith('השכרת רכב')) service = 'car-rental';
-          else if (messageText.startsWith('שיעורי נהיגה')) service = 'driving-lessons';
-          const idx = messageText.indexOf(':');
-          if (idx !== -1) messageText = messageText.slice(idx + 1).trim();
-        }
-        const lead: Lead = {
-          id: row.id,
-          name: row.name || '',
-          email: row.email || '',
-          phone: row.phone || '',
-          service,
-          message: messageText,
-          createdAt: new Date(row.created_at),
-        };
-        setLeads((prev) => [lead, ...prev]);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
+    // Load data from localStorage only after authentication is confirmed
+    const loadLocalData = () => {
+      const savedSocialMedia = localStorage.getItem('socialMedia');
+      const savedProfile = localStorage.getItem('profileData');
+      
+      if (savedSocialMedia) {
+        const parsed = JSON.parse(savedSocialMedia);
+        setSocialMedia(parsed);
+        setTempSocialMedia(parsed);
+      }
+      
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile);
+        setProfileData(parsed);
+        setTempProfileData(parsed);
+      }
     };
-  }, [user, isAdmin, loading]);
+    
+    loadLocalData();
+  }, [loading, user, isAdmin]);
+
+  const loadLeads = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching leads:', error);
+        return;
+      }
+
+      if (data) {
+        const leadsWithTypes = data.map(item => ({
+          id: item.id,
+          name: item.name,
+          email: item.email || '',
+          phone: item.phone || '',
+          message: item.message || '',
+          service: item.message?.includes('השכרת רכב') ? 'car-rental' as const : 'driving-lessons' as const,
+          createdAt: new Date(item.created_at)
+        }));
+        setLeads(leadsWithTypes);
+      }
+    } catch (error) {
+      console.error('Error loading leads:', error);
+    }
+  };
+
+  const loadStudents = async () => {
+    try {
+      const { data: studentsData, error } = await supabase
+        .from('students_real')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching students:', error);
+        return;
+      }
+
+      if (studentsData) {
+        const students = studentsData.map(student => ({
+          id: student.id,
+          name: student.name,
+          status: student.status,
+          year: student.year,
+          passed: student.passed,
+          theory_test_passed: student.theory_test_passed,
+          practical_test_passed: student.practical_test_passed,
+          lessons_completed: student.lessons_completed,
+          phone: student.phone || undefined,
+          email: student.email || undefined,
+          notes: student.notes || undefined
+        }));
+        setStudents(students);
+      }
+    } catch (error) {
+      console.error('Error loading students:', error);
+    }
+  };
 
   const loadUserRoles = async () => {
     try {
-      // First get user roles
+      // First get all user roles
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
@@ -308,415 +335,65 @@ const AdminDashboard = () => {
     }
   };
 
-  const approveTestimonial = async (id: string) => {
-
-  const loadStudents = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('students_real')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      const studentsData = data?.map(student => ({
-        ...student,
-        created_at: new Date(student.created_at),
-        updated_at: new Date(student.updated_at)
-      })) || [];
-      
-      setStudents(studentsData);
-    } catch (error) {
-      console.error('Error loading students:', error);
-      toast({
-        title: "שגיאה",
-        description: "שגיאה בטעינת התלמידים",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const loadLeads = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('contact_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-
-      const leadsData: Lead[] = (data || []).map((row: any) => {
-        let service: 'driving-lessons' | 'car-rental' = 'driving-lessons';
-        let messageText: string = row.message || '';
-        if (typeof messageText === 'string') {
-          if (messageText.startsWith('השכרת רכב')) service = 'car-rental';
-          else if (messageText.startsWith('שיעורי נהיגה')) service = 'driving-lessons';
-          const idx = messageText.indexOf(':');
-          if (idx !== -1) messageText = messageText.slice(idx + 1).trim();
-        }
-        return {
-          id: row.id,
-          name: row.name || '',
-          email: row.email || '',
-          phone: row.phone || '',
-          service,
-          message: messageText,
-          createdAt: new Date(row.created_at),
-        } as Lead;
-      });
-
-      setLeads(leadsData);
-    } catch (error) {
-      console.error('Error loading leads:', error);
-      toast({
-        title: 'שגיאה',
-        description: 'שגיאה בטעינת הלידים',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const addStudent = async () => {
-    if (!newStudent.name.trim()) {
-      toast({
-        title: "שגיאה",
-        description: "שם התלמיד הוא שדה חובה",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('students_real')
-        .insert([{
-          name: newStudent.name,
-          status: newStudent.status,
-          year: newStudent.year,
-          passed: newStudent.status === 'עבר'
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      const studentData: Student = {
-        ...data,
-        created_at: new Date(data.created_at),
-        updated_at: new Date(data.updated_at)
-      };
-
-      setStudents([studentData, ...students]);
-      setNewStudent({ name: '', year: '2024', status: 'בלימוד' });
-      setShowAddStudent(false);
-      
-      toast({
-        title: "הצלחה",
-        description: "התלמיד נוסף בהצלחה",
-      });
-    } catch (error) {
-      console.error('Error adding student:', error);
-      toast({
-        title: "שגיאה",
-        description: "שגיאה בהוספת התלמיד",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const updateStudentStatus = async (id: string, field: string, value: any) => {
-    try {
-      const updateData: any = { [field]: value };
-      
-      // Update status based on test results
-      if (field === 'theory_test_passed' || field === 'practical_test_passed') {
-        const student = students.find(s => s.id === id);
-        if (student) {
-          const updatedStudent = { ...student, [field]: value };
-          if (updatedStudent.theory_test_passed && updatedStudent.practical_test_passed) {
-            updateData.status = 'סיים בהצלחה';
-            updateData.passed = true;
-          } else {
-            updateData.status = 'בתהליך לימוד';
-            updateData.passed = false;
-          }
-        }
-      }
-
-      const { error } = await supabase
-        .from('students_real')
-        .update(updateData)
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setStudents(students.map(student => 
-        student.id === id 
-          ? { ...student, ...updateData, updated_at: new Date() }
-          : student
-      ));
-
-      toast({
-        title: "הצלחה",
-        description: "הנתונים עודכנו בהצלחה",
-      });
-    } catch (error) {
-      console.error('Error updating student:', error);
-      toast({
-        title: "שגיאה",
-        description: "שגיאה בעדכון הנתונים",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteStudent = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('students_real')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setStudents(students.filter(student => student.id !== id));
-      
-      toast({
-        title: "הצלחה",
-        description: "התלמיד נמחק בהצלחה",
-      });
-    } catch (error) {
-      console.error('Error deleting student:', error);
-      toast({
-        title: "שגיאה",
-        description: "שגיאה במחיקת התלמיד",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteLead = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('contact_messages')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      const updatedLeads = leads.filter(lead => lead.id !== id);
-      setLeads(updatedLeads);
-
-      toast({
-        title: 'נמחק',
-        description: 'הליד נמחק בהצלחה',
-      });
-    } catch (error) {
-      console.error('Error deleting lead:', error);
-      toast({
-        title: 'שגיאה',
-        description: 'שגיאה במחיקת הליד',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const deleteReview = (id: string) => {
-    const updatedReviews = reviews.filter(review => review.id !== id);
-    setReviews(updatedReviews);
-    localStorage.setItem('reviews', JSON.stringify(updatedReviews));
-  };
-
-  const exportToExcel = (data: any[], filename: string, sheetName: string) => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-    XLSX.writeFile(workbook, `${filename}.xlsx`);
-  };
-
-  const exportLeads = () => {
-    const leadsData = leads.map(lead => ({
-      'שם': lead.name,
-      'אימייל': lead.email,
-      'טלפון': lead.phone,
-      'סוג שירות': lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב',
-      'הודעה': lead.message || '',
-      'תאריך': lead.createdAt.toLocaleDateString('he-IL')
-    }));
-    exportToExcel(leadsData, 'לידים', 'לידים');
-  };
-
-  const exportReviews = () => {
-    const reviewsData = reviews.map(review => ({
-      'שם': review.name,
-      'דירוג': review.rating,
-      'הערה': review.comment,
-      'תאריך': review.createdAt instanceof Date ? review.createdAt.toLocaleDateString('he-IL') : new Date(review.createdAt).toLocaleDateString('he-IL')
-    }));
-    exportToExcel(reviewsData, 'ביקורות', 'ביקורות');
-  };
-
-  const saveSocialMedia = () => {
-    setSocialMedia(tempSocialMedia);
-    localStorage.setItem('socialMedia', JSON.stringify(tempSocialMedia));
-    // Trigger header refresh by dispatching a custom event
-    window.dispatchEvent(new CustomEvent('socialMediaUpdated'));
-    
-    toast({
-      title: 'נשמר בהצלחה!',
-      description: 'הגדרות הרשתות החברתיות עודכנו',
-      variant: 'default'
-    });
-  };
-
-  const saveProfileData = () => {
-    setProfileData(tempProfileData);
-    localStorage.setItem('profileData', JSON.stringify(tempProfileData));
-    // Trigger profile update event
-    window.dispatchEvent(new CustomEvent('profileUpdated'));
-    
-    toast({
-      title: 'נשמר בהצלחה!',
-      description: 'פרטי הפרופיל עודכנו',
-      variant: 'default'
-    });
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setTempProfileData({
-          ...tempProfileData,
-          image: reader.result as string
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const createNewAdmin = async () => {
-    if (!newAdminEmail.trim() || !newAdminPassword.trim() || !newAdminFirstName.trim() || !newAdminLastName.trim()) {
-      toast({
-        title: "שגיאה",
-        description: "נא למלא את כל השדות",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (newAdminPassword.length < 8) {
-      toast({
-        title: "שגיאה",
-        description: "הסיסמה חייבת להכיל לפחות 8 תווים",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: newAdminEmail,
         password: newAdminPassword,
         options: {
           data: {
             first_name: newAdminFirstName,
             last_name: newAdminLastName
-          },
-          emailRedirectTo: `${window.location.origin}/`
+          }
         }
       });
 
-      if (authError) throw authError;
+      if (error) throw error;
 
-      if (authData.user) {
-        // Add admin role using RPC function
-        const { error: roleError } = await supabase.rpc('grant_admin_if_none', {
-          _user_id: authData.user.id
-        });
+      if (data.user) {
+        // Add admin role to the new user
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: data.user.id,
+            role: 'admin'
+          });
 
-        if (roleError) {
-          console.warn('Could not auto-assign admin role:', roleError);
-          
-          // Try direct insert if RPC fails
-          const { error: directRoleError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: authData.user.id,
-              role: 'admin'
-            });
-
-          if (directRoleError) throw directRoleError;
-        }
+        if (roleError) throw roleError;
 
         toast({
-          title: "מנהל חדש נוצר בהצלחה",
-          description: `המנהל ${newAdminFirstName} ${newAdminLastName} נוסף למערכת`,
+          title: "הצלחה",
+          description: "מנהל חדש נוצר בהצלחה",
         });
 
-        // Reset form
+        // Clear form
         setNewAdminEmail('');
         setNewAdminPassword('');
         setNewAdminFirstName('');
         setNewAdminLastName('');
         
-        // Reload roles
+        // Reload user roles
         loadUserRoles();
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating admin:', error);
       toast({
         title: "שגיאה",
-        description: error.message || "שגיאה ביצירת מנהל חדש",
-        variant: "destructive",
+        description: "שגיאה ביצירת מנהל חדש",
+        variant: "destructive"
       });
     }
   };
 
-  const changeUserRole = async (userId: string, newRole: 'admin' | 'instructor' | 'student' | 'user') => {
+  const deleteUser = async (userId: string) => {
     try {
-      // First delete all existing roles for this user
-      const { error: deleteError } = await supabase
+      // First remove from user_roles table
+      const { error: roleError } = await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
 
-      if (deleteError) throw deleteError;
-
-      // Then insert the new role
-      const { error: insertError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: userId,
-          role: newRole
-        });
-
-      if (insertError) throw insertError;
-
-      toast({
-        title: "הצלחה",
-        description: "תפקיד המשתמש עודכן בהצלחה",
-      });
-
-      loadUserRoles();
-    } catch (error: any) {
-      console.error('Error updating user role:', error);
-      toast({
-        title: "שגיאה",
-        description: "שגיאה בעדכון תפקיד המשתמש",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteUserRole = async (userId: string) => {
-    try {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId);
-
-      if (error) throw error;
+      if (roleError) throw roleError;
 
       toast({
         title: "הצלחה",
@@ -724,7 +401,7 @@ const AdminDashboard = () => {
       });
 
       loadUserRoles();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting user:', error);
       toast({
         title: "שגיאה",
@@ -745,12 +422,13 @@ const AdminDashboard = () => {
     ));
   };
 
-  if (loading || !isAdmin) {
+  // Loading state
+  if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-[80vh]">
-          <div className="text-center">טוען דשבורד...</div>
+          <div className="text-center">טוען דشבורד...</div>
         </div>
       </div>
     );
@@ -784,10 +462,10 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">ביקורות</p>
-                  <p className="text-3xl font-bold text-accent">{reviews.length}</p>
+                  <p className="text-sm text-muted-foreground">סך הביקורות</p>
+                  <p className="text-3xl font-bold text-accent">{approvedTestimonials.length}</p>
                 </div>
-                <MessageSquare className="w-12 h-12 text-accent opacity-20" />
+                <Star className="w-12 h-12 text-accent opacity-20" />
               </div>
             </CardContent>
           </Card>
@@ -796,15 +474,10 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">דירוג ממוצע</p>
-                  <p className="text-3xl font-bold text-success">
-                    {reviews.length > 0 
-                      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-                      : 'N/A'
-                    }
-                  </p>
+                  <p className="text-sm text-muted-foreground">סך התלמידים</p>
+                  <p className="text-3xl font-bold text-green-600">{students.length}</p>
                 </div>
-                <Star className="w-12 h-12 text-success opacity-20" />
+                <MessageSquare className="w-12 h-12 text-green-600 opacity-20" />
               </div>
             </CardContent>
           </Card>
@@ -812,30 +485,22 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="leads" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 h-auto p-1">
-            <TabsTrigger value="leads" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto p-1">
+            <TabsTrigger value="leads" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3">
               <Users className="w-5 h-5" />
               <span className="text-xs sm:text-sm font-medium">לידים</span>
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="reviews" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3">
               <MessageSquare className="w-5 h-5" />
               <span className="text-xs sm:text-sm font-medium">ביקורות</span>
             </TabsTrigger>
-            <TabsTrigger value="students" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-success data-[state=active]:text-success-foreground">
+            <TabsTrigger value="students" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3">
               <Users className="w-5 h-5" />
               <span className="text-xs sm:text-sm font-medium">תלמידים</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-success data-[state=active]:text-success-foreground">
-              <User className="w-5 h-5" />
-              <span className="text-xs sm:text-sm font-medium">פרופיל</span>
-            </TabsTrigger>
-            <TabsTrigger value="social" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
-              <Facebook className="w-5 h-5" />
-              <span className="text-xs sm:text-sm font-medium">רשתות</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3 data-[state=active]:bg-warning data-[state=active]:text-warning-foreground">
-              <Shield className="w-5 h-5" />
-              <span className="text-xs sm:text-sm font-medium">אבטחה</span>
+            <TabsTrigger value="settings" className="flex flex-col items-center gap-1 sm:gap-2 h-auto py-3">
+              <Settings className="w-5 h-5" />
+              <span className="text-xs sm:text-sm font-medium">הגדרות</span>
             </TabsTrigger>
           </TabsList>
 
@@ -849,204 +514,130 @@ const AdminDashboard = () => {
                       ניהול לידים
                     </CardTitle>
                     <CardDescription>
-                      כל הפניות שהתקבלו דרך אתר האינטרנט
+                      כל הפניות שהתקבלו דרך הטופס באתר
                     </CardDescription>
                   </div>
-                  {leads.length > 0 && (
-                    <Button onClick={exportLeads} className="flex items-center gap-2">
-                      <Download className="w-4 h-4" />
-                      ייצא לאקסל
-                    </Button>
-                  )}
                 </div>
               </CardHeader>
               <CardContent>
                 {leads.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    עדיין לא התקבלו פניות
+                    עדיין לא התקבלו לידים
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                     <Table>
-                       <TableHeader>
-                         <TableRow>
-                           <TableHead>שם</TableHead>
-                           <TableHead>אימייל</TableHead>
-                           <TableHead>טלפון</TableHead>
-                           <TableHead>סוג שירות</TableHead>
-                           <TableHead>הודעה</TableHead>
-                           <TableHead>תאריך</TableHead>
-                           <TableHead>פעולות</TableHead>
-                         </TableRow>
-                       </TableHeader>
-                       <TableBody>
-                         {leads.map((lead) => (
-                           <TableRow 
-                             key={lead.id}
-                             className="cursor-pointer hover:bg-muted/50"
-                             onClick={() => {
-                               setSelectedLead(lead);
-                               setIsLeadDialogOpen(true);
-                             }}
-                           >
-                             <TableCell className="font-medium">{lead.name}</TableCell>
-                             <TableCell>
-                               <a 
-                                 href={`mailto:${lead.email}`} 
-                                 className="flex items-center gap-1 text-primary hover:underline"
-                                 onClick={(e) => e.stopPropagation()}
-                               >
-                                 <Mail className="w-4 h-4" />
-                                 {lead.email}
-                               </a>
-                             </TableCell>
-                             <TableCell>
-                               <a 
-                                 href={`tel:${lead.phone}`} 
-                                 className="flex items-center gap-1 text-primary hover:underline"
-                                 onClick={(e) => e.stopPropagation()}
-                               >
-                                 <Phone className="w-4 h-4" />
-                                 {lead.phone}
-                               </a>
-                             </TableCell>
-                             <TableCell>
-                               <Badge variant={lead.service === 'driving-lessons' ? 'default' : 'secondary'}>
-                                 {lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
-                               </Badge>
-                             </TableCell>
-                             <TableCell className="max-w-xs">
-                               <div className="truncate text-sm text-muted-foreground">
-                                 {lead.message && lead.message.length > 50 
-                                   ? `${lead.message.substring(0, 50)}...` 
-                                   : lead.message || 'אין הודעה'}
-                               </div>
-                             </TableCell>
-                             <TableCell>
-                               <div className="flex items-center gap-1">
-                                 <Calendar className="w-4 h-4" />
-                                 {lead.createdAt.toLocaleDateString('he-IL')}
-                               </div>
-                             </TableCell>
-                             <TableCell>
-                               <div className="flex gap-2">
-                                 <Button
-                                   variant="outline"
-                                   size="sm"
-                                   onClick={(e) => {
-                                     e.stopPropagation();
-                                     setSelectedLead(lead);
-                                     setIsLeadDialogOpen(true);
-                                   }}
-                                 >
-                                   <Eye className="w-4 h-4" />
-                                 </Button>
-                                 <Button
-                                   variant="destructive"
-                                   size="sm"
-                                   onClick={(e) => {
-                                     e.stopPropagation();
-                                     deleteLead(lead.id);
-                                   }}
-                                 >
-                                   <Trash2 className="w-4 h-4" />
-                                 </Button>
-                               </div>
-                             </TableCell>
-                           </TableRow>
-                         ))}
-                       </TableBody>
-                     </Table>
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>שם</TableHead>
+                        <TableHead>טלפון</TableHead>
+                        <TableHead>אימייל</TableHead>
+                        <TableHead>שירות</TableHead>
+                        <TableHead>הודעה</TableHead>
+                        <TableHead>תאריך</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {leads.map((lead) => (
+                        <TableRow 
+                          key={lead.id} 
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => {
+                            setSelectedLead(lead);
+                            setIsLeadDialogOpen(true);
+                          }}
+                        >
+                          <TableCell className="font-medium">{lead.name}</TableCell>
+                          <TableCell>{lead.phone}</TableCell>
+                          <TableCell>{lead.email}</TableCell>
+                          <TableCell>
+                            <Badge variant={lead.service === 'driving-lessons' ? 'default' : 'secondary'}>
+                              {lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="max-w-48">
+                            <div className="truncate" title={lead.message}>
+                              {lead.message || 'אין הודעה'}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {lead.createdAt.toLocaleDateString('he-IL')}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>
-            
+
             {/* Lead Details Dialog */}
             <Dialog open={isLeadDialogOpen} onOpenChange={setIsLeadDialogOpen}>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    פרטי הליד
-                  </DialogTitle>
+                  <DialogTitle>פרטי הליד</DialogTitle>
                   <DialogDescription>
-                    צפה בכל הפרטים שהליד שלח
+                    פרטים מלאים של הפניה
                   </DialogDescription>
                 </DialogHeader>
-                
                 {selectedLead && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div>
-                          <Label className="text-sm font-medium text-muted-foreground">שם מלא</Label>
-                          <p className="text-lg font-semibold">{selectedLead.name}</p>
-                        </div>
-                        
-                        <div>
-                          <Label className="text-sm font-medium text-muted-foreground">אימייל</Label>
-                          <div className="flex items-center gap-2">
-                            <Mail className="w-4 h-4 text-primary" />
-                            <a 
-                              href={`mailto:${selectedLead.email}`} 
-                              className="text-primary hover:underline"
-                            >
-                              {selectedLead.email}
-                            </a>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label className="text-sm font-medium text-muted-foreground">טלפון</Label>
-                          <div className="flex items-center gap-2">
-                            <Phone className="w-4 h-4 text-primary" />
-                            <a 
-                              href={`tel:${selectedLead.phone}`} 
-                              className="text-primary hover:underline"
-                            >
-                              {selectedLead.phone}
-                            </a>
-                          </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">שם מלא</Label>
+                        <p className="text-lg font-semibold">{selectedLead.name}</p>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">תאריך יצירת קשר</Label>
+                        <p className="text-lg">{selectedLead.createdAt.toLocaleDateString('he-IL')}</p>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">אימייל</Label>
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-primary" />
+                          <a 
+                            href={`mailto:${selectedLead.email}`} 
+                            className="text-primary hover:underline"
+                          >
+                            {selectedLead.email}
+                          </a>
                         </div>
                       </div>
                       
-                      <div className="space-y-4">
-                        <div>
-                          <Label className="text-sm font-medium text-muted-foreground">סוג שירות</Label>
-                          <div>
-                            <Badge variant={selectedLead.service === 'driving-lessons' ? 'default' : 'secondary'} className="text-base">
-                              {selectedLead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label className="text-sm font-medium text-muted-foreground">תאריך פנייה</Label>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            <span>{selectedLead.createdAt.toLocaleDateString('he-IL')}</span>
-                            <span className="text-muted-foreground">
-                              {selectedLead.createdAt.toLocaleTimeString('he-IL', { 
-                                hour: '2-digit', 
-                                minute: '2-digit' 
-                              })}
-                            </span>
-                          </div>
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">טלפון</Label>
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-primary" />
+                          <a 
+                            href={`tel:${selectedLead.phone}`} 
+                            className="text-primary hover:underline"
+                          >
+                            {selectedLead.phone}
+                          </a>
                         </div>
                       </div>
                     </div>
                     
-                    {selectedLead.message && (
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-muted-foreground">הודעה מלאה</Label>
-                        <div className="bg-muted/50 rounded-lg p-4 border">
-                          <p className="text-foreground whitespace-pre-wrap">
-                            {selectedLead.message}
-                          </p>
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">סוג שירות</Label>
+                        <div>
+                          <Badge variant={selectedLead.service === 'driving-lessons' ? 'default' : 'secondary'} className="text-base">
+                            {selectedLead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
+                          </Badge>
                         </div>
                       </div>
-                    )}
+                      
+                      {selectedLead.message && (
+                        <div>
+                          <Label className="text-sm font-medium text-muted-foreground">הודעה</Label>
+                          <div className="bg-muted p-4 rounded-md">
+                            <p className="text-foreground whitespace-pre-wrap">{selectedLead.message}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="flex justify-between pt-4 border-t">
                       <div className="flex gap-2">
@@ -1065,17 +656,6 @@ const AdminDashboard = () => {
                           התקשר
                         </Button>
                       </div>
-                      
-                      <Button
-                        variant="destructive"
-                        onClick={() => {
-                          deleteLead(selectedLead.id);
-                          setIsLeadDialogOpen(false);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        מחק ליד
-                      </Button>
                     </div>
                   </div>
                 )}
@@ -1201,32 +781,6 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           </TabsContent>
-                                <div className="flex items-center gap-1">
-                                  {renderStars(review.rating)}
-                                </div>
-                                <span className="text-sm text-muted-foreground">
-                                  {review.createdAt instanceof Date ? review.createdAt.toLocaleDateString('he-IL') : new Date(review.createdAt).toLocaleDateString('he-IL')}
-                                </span>
-                              </div>
-                              <p className="text-foreground">{review.comment}</p>
-                            </div>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => deleteReview(review.id)}
-                              className="ml-4"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="students">
             <Card className="shadow-lg">
@@ -1241,435 +795,146 @@ const AdminDashboard = () => {
                       כל התלמידים שלך - נוכחיים ובוגרים
                     </CardDescription>
                   </div>
-                  <Button 
-                    onClick={() => setShowAddStudent(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    הוסף תלמיד
-                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                {showAddStudent && (
-                  <div className="mb-6 p-4 bg-muted rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4">הוסף תלמיד חדש</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="studentName">שם מלא *</Label>
-                        <Input
-                          id="studentName"
-                          value={newStudent.name}
-                          onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-                          placeholder="הכנס שם מלא"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="studentStatus">סטטוס</Label>
-                        <Select 
-                          value={newStudent.status}
-                          onValueChange={(value) => setNewStudent({ ...newStudent, status: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="בחר סטטוס" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="בלימוד">בלימוד</SelectItem>
-                            <SelectItem value="עבר">עבר</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="studentYear">שנת לימוד</Label>
-                        <Input
-                          id="studentYear"
-                          value={newStudent.year}
-                          onChange={(e) => setNewStudent({ ...newStudent, year: e.target.value })}
-                          placeholder="הכנס שנת לימוד (למשל 2024)"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mt-4">
-                      <Button onClick={addStudent} className="flex items-center gap-2">
-                        <Check className="w-4 h-4" />
-                        שמור
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setShowAddStudent(false);
-                          setNewStudent({ name: '', year: '2024', status: 'בלימוד' });
-                        }}
-                        className="flex items-center gap-2"
-                      >
-                        <X className="w-4 h-4" />
-                        ביטול
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
                 {students.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     עדיין לא נוספו תלמידים
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>שם</TableHead>
-                              <TableHead>סטטוס</TableHead>
-                              <TableHead>שנה</TableHead>
-                              <TableHead>פעולות</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {students.map((student) => (
-                              <TableRow key={student.id}>
-                                <TableCell className="font-medium">
-                                  {student.name}
-                                </TableCell>
-                                <TableCell>
-                                  <Select
-                                    value={student.passed ? 'passed' : 'learning'}
-                                    onValueChange={(value) => {
-                                      const passed = value === 'passed';
-                                      const status = passed ? 'עבר' : 'בלימוד';
-                                      updateStudentStatus(student.id, 'passed', passed);
-                                      updateStudentStatus(student.id, 'status', status);
-                                    }}
-                                  >
-                                    <SelectTrigger className="w-32">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="learning">בלימוד</SelectItem>
-                                      <SelectItem value="passed">עבר</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </TableCell>
-                                <TableCell>
-                                  {student.year}
-                                </TableCell>
-                                <TableCell>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => deleteStudent(student.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>שם</TableHead>
+                        <TableHead>שנה</TableHead>
+                        <TableHead>סטטוס</TableHead>
+                        <TableHead>מבחן תיאוריה</TableHead>
+                        <TableHead>מבחן מעשי</TableHead>
+                        <TableHead>שיעורים</TableHead>
+                        <TableHead>עבר מבחן</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {students.map((student) => (
+                        <TableRow key={student.id}>
+                          <TableCell className="font-medium">{student.name}</TableCell>
+                          <TableCell>{student.year}</TableCell>
+                          <TableCell>{student.status}</TableCell>
+                          <TableCell>
+                            <Badge variant={student.theory_test_passed ? 'default' : 'secondary'}>
+                              {student.theory_test_passed ? 'עבר' : 'לא עבר'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={student.practical_test_passed ? 'default' : 'secondary'}>
+                              {student.practical_test_passed ? 'עבר' : 'לא עבר'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{student.lessons_completed}</TableCell>
+                          <TableCell>
+                            <Badge variant={student.passed ? 'default' : 'secondary'}>
+                              {student.passed ? 'כן' : 'לא'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="profile">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  פרופיל אישי
-                </CardTitle>
-                <CardDescription>
-                  הוסף תמונת פרופיל ותיאור אישי שיוצגו באתר
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-6">
-                  <div className="space-y-4">
-                    <Label className="flex items-center gap-2">
-                      <Camera className="w-4 h-4" />
-                      תמונת פרופיל
-                    </Label>
-                    <div className="flex flex-col items-center gap-4">
-                      {tempProfileData.image ? (
-                        <div className="relative">
-                          <img 
-                            src={tempProfileData.image} 
-                            alt="תמונת פרופיל"
-                            className="w-32 h-32 rounded-full object-cover border-4 border-primary"
-                          />
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="absolute -top-2 -right-2 w-8 h-8 rounded-full p-0"
-                            onClick={() => setTempProfileData({...tempProfileData, image: undefined})}
-                          >
-                            ×
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="w-32 h-32 rounded-full bg-muted border-2 border-dashed border-muted-foreground flex items-center justify-center">
-                          <Camera className="w-8 h-8 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="flex flex-col items-center gap-2 w-full">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          id="profile-image"
-                        />
-                        <Button 
-                          variant="outline" 
-                          onClick={() => document.getElementById('profile-image')?.click()}
-                          className="flex items-center gap-2 w-full sm:w-auto"
-                        >
-                          <Upload className="w-4 h-4" />
-                          {tempProfileData.image ? 'שנה תמונה' : 'העלה תמונה'}
-                        </Button>
-                        <p className="text-sm text-muted-foreground text-center">
-                          מומלץ: תמונה בגודל 400x400 פיקסלים
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description">
-                      תיאור אישי
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="כתוב כאן על עצמך כמורה נהיגה ומשכיר רכבי הוראה..."
-                      value={tempProfileData.description || ''}
-                      onChange={(e) => setTempProfileData({...tempProfileData, description: e.target.value})}
-                      rows={4}
-                      className="resize-none"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      התיאור יוצג באתר לצד תמונת הפרופיל
-                    </p>
-                  </div>
-                </div>
-                
-                <Button onClick={saveProfileData} className="flex items-center gap-2 w-full sm:w-auto">
-                  <Save className="w-4 h-4" />
-                  שמור פרופיל
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="social">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Facebook className="w-5 h-5" />
-                  ניהול רשתות חברתיות
-                </CardTitle>
-                <CardDescription>
-                  הוסף קישורים לרשתות החברתיות שיוצגו בראש הדף
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="facebook" className="flex items-center gap-2">
-                      <Facebook className="w-4 h-4" />
-                      פייסבוק
-                    </Label>
-                    <Input
-                      id="facebook"
-                      type="url"
-                      placeholder="https://facebook.com/yourprofile"
-                      value={tempSocialMedia.facebook || ''}
-                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, facebook: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="instagram" className="flex items-center gap-2">
-                      <Instagram className="w-4 h-4" />
-                      אינסטגרם
-                    </Label>
-                    <Input
-                      id="instagram"
-                      type="url"
-                      placeholder="https://instagram.com/yourprofile"
-                      value={tempSocialMedia.instagram || ''}
-                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, instagram: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="tiktok" className="flex items-center gap-2">
-                      <Music className="w-4 h-4" />
-                      טיקטוק
-                    </Label>
-                    <Input
-                      id="tiktok"
-                      type="url"
-                      placeholder="https://tiktok.com/@yourprofile"
-                      value={tempSocialMedia.tiktok || ''}
-                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, tiktok: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="whatsapp" className="flex items-center gap-2">
-                      <MessageCircle className="w-4 h-4" />
-                      וואטסאפ
-                    </Label>
-                    <Input
-                      id="whatsapp"
-                      type="url"
-                      placeholder="https://wa.me/972503250150"
-                      value={tempSocialMedia.whatsapp || ''}
-                      onChange={(e) => setTempSocialMedia({...tempSocialMedia, whatsapp: e.target.value})}
-                    />
-                  </div>
-                </div>
-                
-                <Button onClick={saveSocialMedia} className="flex items-center gap-2 w-full sm:w-auto">
-                  <Save className="w-4 h-4" />
-                  שמור שינויים
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="settings">
-            <div className="space-y-6">
-              {/* User Management */}
+            <div className="grid lg:grid-cols-2 gap-6">
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
+                    <User className="w-5 h-5" />
                     ניהול משתמשים
                   </CardTitle>
                   <CardDescription>
-                    ניהול מנהלים ותפקידי משתמשים במערכת
+                    יצירת מנהלים חדשים וניהול הרשאות
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Create New Admin */}
-                  <div className="bg-muted/50 rounded-lg p-4 border">
-                    <h3 className="font-semibold mb-4 flex items-center gap-2">
-                      <Plus className="w-4 h-4" />
-                      הוסף מנהל חדש
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="newAdminFirstName">שם פרטי</Label>
+                  {/* Create Admin Form */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold">יצירת מנהל חדש</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">שם פרטי</Label>
                         <Input
-                          id="newAdminFirstName"
+                          id="firstName"
                           value={newAdminFirstName}
                           onChange={(e) => setNewAdminFirstName(e.target.value)}
-                          placeholder="הכנס שם פרטי"
+                          placeholder="שם פרטי"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="newAdminLastName">שם משפחה</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">שם משפחה</Label>
                         <Input
-                          id="newAdminLastName"
+                          id="lastName"
                           value={newAdminLastName}
                           onChange={(e) => setNewAdminLastName(e.target.value)}
-                          placeholder="הכנס שם משפחה"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="newAdminEmail">אימייל</Label>
-                        <Input
-                          id="newAdminEmail"
-                          type="email"
-                          value={newAdminEmail}
-                          onChange={(e) => setNewAdminEmail(e.target.value)}
-                          placeholder="admin@example.com"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="newAdminPassword">סיסמה</Label>
-                        <Input
-                          id="newAdminPassword"
-                          type="password"
-                          value={newAdminPassword}
-                          onChange={(e) => setNewAdminPassword(e.target.value)}
-                          placeholder="סיסמה חזקה (לפחות 8 תווים)"
+                          placeholder="שם משפחה"
                         />
                       </div>
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">אימייל</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={newAdminEmail}
+                        onChange={(e) => setNewAdminEmail(e.target.value)}
+                        placeholder="admin@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">סיסמה</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={newAdminPassword}
+                        onChange={(e) => setNewAdminPassword(e.target.value)}
+                        placeholder="סיסמה חזקה"
+                      />
+                    </div>
                     <Button 
                       onClick={createNewAdmin}
-                      className="mt-4 flex items-center gap-2"
+                      className="w-full"
+                      disabled={!newAdminEmail || !newAdminPassword || !newAdminFirstName || !newAdminLastName}
                     >
-                      <Plus className="w-4 h-4" />
-                      הוסף מנהל
+                      צור מנהל חדש
                     </Button>
                   </div>
-
-                  {/* Users List */}
-                  <div>
-                    <h3 className="font-semibold mb-4">משתמשים במערכת</h3>
-                    {userRoles.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        אין משתמשים במערכת
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>שם</TableHead>
-                              <TableHead>תפקיד</TableHead>
-                              <TableHead>תאריך יצירה</TableHead>
-                              <TableHead>פעולות</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {userRoles.map((userRole) => (
-                              <TableRow key={userRole.id}>
-                                <TableCell className="font-medium">
-                                  {userRole.first_name} {userRole.last_name}
-                                </TableCell>
-                                <TableCell>
-                                  <Select
-                                    value={userRole.role}
-                                    onValueChange={(value) => changeUserRole(userRole.user_id, value as 'admin' | 'instructor' | 'student' | 'user')}
-                                  >
-                                    <SelectTrigger className="w-32">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="admin">מנהל</SelectItem>
-                                      <SelectItem value="user">משתמש</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </TableCell>
-                                <TableCell>
-                                  {userRole.created_at.toLocaleDateString('he-IL')}
-                                </TableCell>
-                                <TableCell>
-                                  {userRole.role !== 'admin' && (
-                                    <Button
-                                      variant="destructive"
-                                      size="sm"
-                                      onClick={() => deleteUserRole(userRole.user_id)}
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    )}
+                  
+                  {/* User List */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold">רשימת משתמשים</h4>
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {userRoles.map((userRole) => (
+                        <div key={userRole.id} className="flex items-center justify-between p-3 border rounded-md">
+                          <div className="flex-1">
+                            <p className="font-medium">{userRole.first_name} {userRole.last_name}</p>
+                            <p className="text-sm text-muted-foreground">{userRole.role}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteUser(userRole.user_id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Security Settings */}
+              
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -1726,7 +991,7 @@ const AdminDashboard = () => {
                         <p><strong>מנהלים:</strong> {userRoles.filter(u => u.role === 'admin').length}</p>
                         <p><strong>משתמשים:</strong> {userRoles.length}</p>
                         <p><strong>לידים:</strong> {leads.length}</p>
-                        <p><strong>ביקורות:</strong> {reviews.length}</p>
+                        <p><strong>ביקורות:</strong> {approvedTestimonials.length}</p>
                       </CardContent>
                     </Card>
                   </div>
