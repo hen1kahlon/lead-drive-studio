@@ -1,7 +1,6 @@
 export interface Lead {
   id: string;
   name: string;
-  email: string;
   phone: string;
   service: 'driving-lessons' | 'car-rental';
   licenseType?: 'B' | 'A' | 'A1' | 'A2';

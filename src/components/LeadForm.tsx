@@ -16,7 +16,6 @@ interface LeadFormProps {
 const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     phone: '',
     service: 'driving-lessons' as 'driving-lessons' | 'car-rental',
     licenseType: 'B' as 'B' | 'A' | 'A1' | 'A2',
@@ -27,7 +26,7 @@ const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.phone) {
+    if (!formData.name || !formData.phone) {
       toast({
         title: 'שגיאה',
         description: 'אנא מלא את כל השדות הנדרשים',
@@ -39,7 +38,6 @@ const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
     onLeadSubmit(formData);
     setFormData({
       name: '',
-      email: '',
       phone: '',
       service: 'driving-lessons',
       licenseType: 'B',
@@ -73,21 +71,6 @@ const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="הכנס את שמך המלא"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              אימייל *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="הכנס את כתובת האימייל שלך"
               required
             />
           </div>

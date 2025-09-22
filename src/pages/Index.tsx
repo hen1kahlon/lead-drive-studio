@@ -166,7 +166,6 @@ const Index = () => {
         .insert([
           {
             name: leadData.name,
-            email: leadData.email,
             phone: leadData.phone,
             message: `${leadData.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב למורים'}${leadData.service === 'driving-lessons' && leadData.licenseType ? ` | דרגה: ${leadData.licenseType}` : ''}: ${leadData.message || ''}`,
           },

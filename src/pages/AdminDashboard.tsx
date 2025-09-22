@@ -530,7 +530,6 @@ const AdminDashboard = () => {
                       <TableRow>
                         <TableHead>שם</TableHead>
                         <TableHead>טלפון</TableHead>
-                        <TableHead>אימייל</TableHead>
                         <TableHead>שירות</TableHead>
                         <TableHead>הודעה</TableHead>
                         <TableHead>תאריך</TableHead>
@@ -548,7 +547,6 @@ const AdminDashboard = () => {
                         >
                           <TableCell className="font-medium">{lead.name}</TableCell>
                           <TableCell>{lead.phone}</TableCell>
-                          <TableCell>{lead.email}</TableCell>
                           <TableCell>
                             <Badge variant={lead.service === 'driving-lessons' ? 'default' : 'secondary'}>
                               {lead.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב'}
@@ -593,19 +591,6 @@ const AdminDashboard = () => {
                       </div>
                       
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">אימייל</Label>
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-primary" />
-                          <a 
-                            href={`mailto:${selectedLead.email}`} 
-                            className="text-primary hover:underline"
-                          >
-                            {selectedLead.email}
-                          </a>
-                        </div>
-                      </div>
-                      
-                      <div>
                         <Label className="text-sm font-medium text-muted-foreground">טלפון</Label>
                         <div className="flex items-center gap-2">
                           <Phone className="w-4 h-4 text-primary" />
@@ -641,13 +626,6 @@ const AdminDashboard = () => {
                     
                     <div className="flex justify-between pt-4 border-t">
                       <div className="flex gap-2">
-                        <Button 
-                          variant="outline"
-                          onClick={() => window.open(`mailto:${selectedLead.email}`, '_blank')}
-                        >
-                          <Mail className="w-4 h-4 mr-2" />
-                          שלח מייל
-                        </Button>
                         <Button 
                           variant="outline"
                           onClick={() => window.open(`tel:${selectedLead.phone}`, '_blank')}
