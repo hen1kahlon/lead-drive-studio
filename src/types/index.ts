@@ -4,6 +4,7 @@ export interface Lead {
   email: string;
   phone: string;
   service: 'driving-lessons' | 'car-rental';
+  licenseType?: 'B' | 'A' | 'A1' | 'A2';
   message?: string;
   createdAt: Date;
 }

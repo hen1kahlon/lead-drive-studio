@@ -163,12 +163,14 @@ const Index = () => {
       // Save to Supabase database
       const { data, error } = await supabase
         .from('contact_messages')
-        .insert([{
-          name: leadData.name,
-          email: leadData.email,
-          phone: leadData.phone,
-          message: `${leadData.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב למורים'}: ${leadData.message || ''}`
-        }])
+        .insert([
+          {
+            name: leadData.name,
+            email: leadData.email,
+            phone: leadData.phone,
+            message: `${leadData.service === 'driving-lessons' ? 'שיעורי נהיגה' : 'השכרת רכב למורים'}${leadData.service === 'driving-lessons' && leadData.licenseType ? ` | דרגה: ${leadData.licenseType}` : ''}: ${leadData.message || ''}`,
+          },
+        ])
         .select();
 
       if (error) {

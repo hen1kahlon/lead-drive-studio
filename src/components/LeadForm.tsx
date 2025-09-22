@@ -19,6 +19,7 @@ const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
     email: '',
     phone: '',
     service: 'driving-lessons' as 'driving-lessons' | 'car-rental',
+    licenseType: 'B' as 'B' | 'A' | 'A1' | 'A2',
     message: ''
   });
   const { toast } = useToast();
@@ -41,6 +42,7 @@ const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
       email: '',
       phone: '',
       service: 'driving-lessons',
+      licenseType: 'B',
       message: ''
     });
 
@@ -123,6 +125,61 @@ const LeadForm = ({ onLeadSubmit }: LeadFormProps) => {
               </div>
             </RadioGroup>
           </div>
+          {formData.service === 'driving-lessons' && (
+            <div className="space-y-3 border-t pt-4">
+              <Label className="text-base font-medium">דרגת רישיון נהיגה</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <input
+                    type="radio"
+                    id="licenseB"
+                    name="licenseType"
+                    value="B"
+                    checked={formData.licenseType === 'B'}
+                    onChange={(e) => setFormData({ ...formData, licenseType: e.target.value as 'B' | 'A' | 'A1' | 'A2' })}
+                    className="h-4 w-4 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="licenseB" className="cursor-pointer text-sm">B (אוטומט)</Label>
+                </div>
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <input
+                    type="radio"
+                    id="licenseA"
+                    name="licenseType"
+                    value="A"
+                    checked={formData.licenseType === 'A'}
+                    onChange={(e) => setFormData({ ...formData, licenseType: e.target.value as 'B' | 'A' | 'A1' | 'A2' })}
+                    className="h-4 w-4 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="licenseA" className="cursor-pointer text-sm">A</Label>
+                </div>
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <input
+                    type="radio"
+                    id="licenseA1"
+                    name="licenseType"
+                    value="A1"
+                    checked={formData.licenseType === 'A1'}
+                    onChange={(e) => setFormData({ ...formData, licenseType: e.target.value as 'B' | 'A' | 'A1' | 'A2' })}
+                    className="h-4 w-4 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="licenseA1" className="cursor-pointer text-sm">A1</Label>
+                </div>
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <input
+                    type="radio"
+                    id="licenseA2"
+                    name="licenseType"
+                    value="A2"
+                    checked={formData.licenseType === 'A2'}
+                    onChange={(e) => setFormData({ ...formData, licenseType: e.target.value as 'B' | 'A' | 'A1' | 'A2' })}
+                    className="h-4 w-4 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="licenseA2" className="cursor-pointer text-sm">A2</Label>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="message" className="flex items-center gap-2">
