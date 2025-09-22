@@ -34,39 +34,59 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Check if user is admin when auth state changes
-        if (session?.user) {
-          setTimeout(async () => {
-            try {
-              const { data: roleData } = await supabase
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', session.user.id)
-                .single();
-              
-              setIsAdmin(roleData?.role === 'admin');
-            } catch (error) {
-              console.error('Error checking user role:', error);
-              setIsAdmin(false);
-            }
-          }, 0);
-        } else {
-          setIsAdmin(false);
-        }
-        
+    (event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      // Check if user is admin when auth state changes (defer to avoid deadlocks)
+      if (session?.user) {
+        setTimeout(async () => {
+          try {
+            const { data: roles, error } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id);
+            if (error) throw error;
+            setIsAdmin(!!roles?.some((r: any) => r.role === 'admin'));
+          } catch (error) {
+            console.error('Error checking user role:', error);
+            setIsAdmin(false);
+          } finally {
+            setLoading(false);
+          }
+        }, 0);
+      } else {
+        setIsAdmin(false);
         setLoading(false);
       }
+    }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+
+      if (session?.user) {
+        setTimeout(async () => {
+          try {
+            const { data: roles, error } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id);
+            if (error) throw error;
+            setIsAdmin(!!roles?.some((r: any) => r.role === 'admin'));
+          } catch (error) {
+            console.error('Error checking user role (init):', error);
+            setIsAdmin(false);
+          } finally {
+            setLoading(false);
+          }
+        }, 0);
+      } else {
+        setIsAdmin(false);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
