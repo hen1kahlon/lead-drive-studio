@@ -26,6 +26,15 @@ interface Student {
   passed: boolean;
 }
 
+interface Testimonial {
+  id: string;
+  name: string;
+  rating: number;
+  comment?: string;
+  is_approved: boolean;
+  created_at: string;
+}
+
 const Index = () => {
   const [leads, setLeads] = useState<Lead[]>(() => {
     const saved = localStorage.getItem('leads');
@@ -60,167 +69,93 @@ const Index = () => {
   useEffect(() => {
     const loadStudents = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: studentsData, error } = await supabase
           .from('students_real')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
-
-        const studentsData = data?.map(student => ({
-          id: student.id,
-          name: student.name,
-          status: student.status,
-          year: student.year,
-          passed: student.passed
-        })) || [];
-        
-        setStudents(studentsData);
-
-        // Add reviews for students who passed
-        const passedStudents = studentsData.filter(student => student.passed);
-        const currentReviews = JSON.parse(localStorage.getItem('reviews') || '[]').map((r: any) => ({
-          ...r,
-          createdAt: new Date(r.createdAt)
-        }));
-        
-        // Check if we already have reviews from these students
-        const existingReviewNames = currentReviews.map((r: any) => r.name);
-        
-        const studentReviews = [
-          {
-            name: "עמי דהן",
-            rating: 5,
-            comment: "חן הוא מורה נהיגה מעולה! בזכותו עברתי בפעם הראשונה. מורה סבלני ומקצועי שיודע איך להעביר ביטחון ולהכין לבחינה בצורה הטובה ביותר. ממליץ בחום!"
-          },
-          {
-            name: "נועה כהן", 
-            rating: 5,
-            comment: "תודה רבה לחן על כל הסבלנות והמקצועיות! השיעורים היו ممוקדים ויעילים, והרגשתי מוכנה לבחינה. מורה נהיגה מהטובים שיש!"
-          },
-          {
-            name: "יונתן לוי",
-            rating: 4,
-            comment: "מורה מצוין עם הרבה ניסיון. למד איתי בסבלנות ועזר לי להתגבר על החרדות שלי מנהיגה. עברתי בהצלחה הודות להדרכה המקצועית שלו."
-          },
-          {
-            name: "מיכל אברהם",
-            rating: 5,
-            comment: "חן מורה נהיגה מדהים! השיעורים היו מעניינים ולא מלחיצים. הוא יודע בדיוק איך להכין תלמיד לבחינה ולתת לו את הביטחון הדרוש. המלצה חמה!"
-          },
-          {
-            name: "דוד שמש",
-            rating: 5,
-            comment: "למדתי עם חן ועברתי בפעם הראשונה! מורה מקצועי, סבלני ועם הרבה ידע. השיעורים היו מובנים והתקדמתי מהר. תודה על הכל!"
-          },
-          {
-            name: "רונית גולן",
-            rating: 4,
-            comment: "מורה נהיגה מעולה עם גישה אישית לכל תלמיד. חן עזר לי להבין את כל הכללים ולהרגיש בטוחה מאחורי ההגה. עברתי בהצלחה!"
-          },
-          {
-            name: "אורי מזרחי",
-            rating: 5,
-            comment: "השיעורים עם חן היו הכי טובים! מורה מקצועי שיודע להסביר בבהירות ולהכין לבחינה בצורה מושלמת. עברתי ללא בעיות. תודה רבה!"
-          },
-          {
-            name: "שירה כץ",
-            rating: 5,
-            comment: "חן הוא מורה נהיגה יוצא מן הכלל! סבלני, מקצועי ותמיד זמין לעזור. בזכותו עברתי את הבחינה ורכשתי ביטחון בנהיגה. ממליצה בחום!"
-          },
-          {
-            name: "עומר ביטון",
-            rating: 5,
-            comment: "מורה נהיגה פנטסטי! חן לימד אותי מהבסיס ועזר לי להיות נהג בטוח ואחראי. השיעורים היו מעניינים והתקדמתי במהירות. עברתי בקלות!"
-          },
-          {
-            name: "טל רוזן",
-            rating: 4,
-            comment: "למדתי עם חן והחוויה הייתה מעולה. מורה סבלני שמתאים את השיעורים לקצב של כל תלמיד. עזר לי להתמודד עם הפחדים ולעבור בהצלחה."
-          },
-          {
-            name: "אבי כרמי",
-            rating: 5,
-            comment: "חן הוא מורה נהיגה מהמעלה הראשונה! ההוראה שלו ברורה ומקצועית, והוא תמיד דואג שהתלמיד ירגיש בטוח. עברתי בפעם הראשונה בזכותו!"
-          },
-          {
-            name: "לירון אדרי",
-            rating: 5,
-            comment: "השיעורים עם חן היו חוויה נהדרת. מורה מקצועי ואמין שיודע להעביר את הידע בצורה הכי טובה. תודה על ההכנה המושלמת לבחינה!"
-          },
-          {
-            name: "גיא שלום",
-            rating: 4,
-            comment: "מורה נהיגה איכותי עם הרבה ניסיון. חן עזר לי לבנות ביטחון בנהיגה ולהכין אותי בצורה מעולה לבחינה. המלצה חמה לכל מי שרוצה ללמוד נהיגה!"
-          },
-          {
-            name: "מאיה קוגן",
-            rating: 5,
-            comment: "חן מורה נהיגה נפלא! ההוראה שלו מאוד מקצועית והוא תמיד מקפיד על הבטיחות. בזכותו עברתי את הבחינה בקלות ורכשתי ביטחון עצמי בנהיגה."
-          },
-          {
-            name: "רועי פרידמן",
-            rating: 5,
-            comment: "למדתי עם חן ואני מאוד מרוצה! מורה סבלני ומקצועי שיודע איך להסביר בבהירות. השיעורים היו יעילים ומותאמים אישית. עברתי בהצלחה!"
-          },
-          {
-            name: "יעל בן דוד",
-            rating: 4,
-            comment: "חן הוא מורה נהיגה מעולה עם גישה חמה ומקצועית. עזר לי להתגבר על הפחדים ולרכוש ביטחון בנהיגה. עברתי את הבחינה והכל בזכותו!"
-          },
-          {
-            name: "אלעד חזן",
-            rating: 5,
-            comment: "מורה נהיגה יוצא דופן! חן מלמד בסבלנות רבה ויודע איך להתאים את השיעורים לכל תלמיד. בזכות ההכנה המעולה עברתי בפעם הראשונה!"
-          },
-          {
-            name: "נטע גרוס",
-            rating: 5,
-            comment: "השיעורים עם חן היו הכי טובים! מורה מקצועי ונעים שיודע להעביר את החומר בצורה ברורה ומעניינת. עברתי בהצלחה ואני ממליצה עליו לכולם!"
-          },
-          {
-            name: "יוסי אלבז",
-            rating: 4,
-            comment: "חן מורה נהיגה מצוין! למד איתי בסבלנות ועזר לי להבין את כל העקרונות החשובים. ההכנה הייתה מושלמת ועברתי את הבחינה בקלות."
-          },
-          {
-            name: "ליאת שמואלי",
-            rating: 5,
-            comment: "מורה נהיגה פנטסטי! חן יודע בדיוק איך לגרום לתלמיד להרגיש בטוח ומוכן. השיעורים היו מעניינים והתקדמתי מהר. תודה על הכל!"
-          }
-        ];
-
-        // Add reviews only for passed students who don't already have reviews
-        const newReviews = [];
-        let reviewIndex = 0;
-        
-        for (const student of passedStudents) {
-          if (!existingReviewNames.includes(student.name) && reviewIndex < studentReviews.length) {
-            const review = {
-              id: `student-${student.id}-${Date.now()}`,
-              name: student.name,
-              rating: studentReviews[reviewIndex].rating,
-              comment: studentReviews[reviewIndex].comment,
-              createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000) // Random date within last 90 days
-            };
-            newReviews.push(review);
-            reviewIndex++;
-          }
+        if (error) {
+          console.error('Error fetching students:', error);
+          return;
         }
 
-        if (newReviews.length > 0) {
-          const updatedReviews = [...newReviews, ...currentReviews];
-          setReviews(updatedReviews);
-          localStorage.setItem('reviews', JSON.stringify(updatedReviews));
-        }
+        if (studentsData) {
+          const students = studentsData.map(student => ({
+            id: student.id,
+            name: student.name,
+            status: student.status,
+            year: student.year,
+            passed: student.passed
+          }));
+          setStudents(students);
 
+          // Add reviews for students who passed (but only if we don't have reviews yet from Supabase)
+          if (reviews.length === 0) {
+            const passedStudents = students.filter(student => student.passed);
+            const studentReviews: Review[] = passedStudents.slice(0, 3).map((student, index) => {
+              const comments = [
+                'מורה מעולה! עזר לי לעבור במבחן בפעם הראשונה. מאוד סבלני ומקצועי.',
+                'השיעורים היו ברורים ויעילים. הרגשתי מוכן ובטוח במבחן. ממליץ בחום!',
+                'חן הוא מורה נהיגה מעולה. הסביר לי הכל בסבלנות ועזר לי להצליח במבחן.'
+              ];
+              const ratings = [5, 5, 4];
+              
+              return {
+                id: `student-${student.id}`,
+                name: student.name,
+                rating: ratings[index] || 5,
+                comment: comments[index] || 'מורה מעולה!',
+                createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+              };
+            });
+            
+            setReviews(prevReviews => {
+              const newReviews = [...prevReviews];
+              studentReviews.forEach(studentReview => {
+                if (!newReviews.some(review => review.id === studentReview.id)) {
+                  newReviews.push(studentReview);
+                }
+              });
+              return newReviews;
+            });
+          }
+        }
       } catch (error) {
         console.error('Error loading students:', error);
-        setStudents([]);
+      }
+    };
+
+    // Load testimonials from Supabase
+    const loadTestimonials = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('testimonials')
+          .select('*')
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error loading testimonials:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const testimonials = data.map(testimonial => ({
+            id: testimonial.id,
+            name: testimonial.name,
+            rating: testimonial.rating,
+            comment: testimonial.comment || '',
+            createdAt: new Date(testimonial.created_at)
+          }));
+          setReviews(testimonials);
+        }
+      } catch (error) {
+        console.error('Error loading testimonials:', error);
       }
     };
 
     loadStudents();
+    loadTestimonials();
   }, []);
 
   const handleLeadSubmit = async (leadData: Omit<Lead, 'id' | 'createdAt'>) => {
@@ -257,15 +192,28 @@ const Index = () => {
     }
   };
 
-  const handleReviewSubmit = (reviewData: Omit<Review, 'id' | 'createdAt'>) => {
-    const newReview: Review = {
-      ...reviewData,
-      id: Date.now().toString(),
-      createdAt: new Date()
-    };
-    const updatedReviews = [newReview, ...reviews];
-    setReviews(updatedReviews);
-    localStorage.setItem('reviews', JSON.stringify(updatedReviews));
+  const handleReviewSubmit = async (reviewData: Omit<Review, 'id' | 'createdAt'>) => {
+    try {
+      // Save to Supabase database
+      const { data, error } = await supabase
+        .from('testimonials')
+        .insert([{
+          name: reviewData.name,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+          is_approved: false // Requires admin approval
+        }])
+        .select();
+
+      if (error) {
+        console.error('Error saving testimonial:', error);
+        return;
+      }
+
+      console.log('Testimonial saved successfully:', data);
+    } catch (error) {
+      console.error('Error submitting testimonial:', error);
+    }
   };
 
   const averageRating = reviews.length > 0 

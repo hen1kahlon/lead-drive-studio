@@ -41,7 +41,7 @@ const ReviewForm = ({ onReviewSubmit }: ReviewFormProps) => {
 
     toast({
       title: 'תודה!',
-      description: 'הביקורת שלך נוספה בהצלחה',
+      description: 'הביקורת שלך נשלחה לאישור ותופיע באתר לאחר אישור מנהל',
       variant: 'default'
     });
   };

@@ -59,6 +59,8 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [pendingTestimonials, setPendingTestimonials] = useState<any[]>([]);
+  const [approvedTestimonials, setApprovedTestimonials] = useState<any[]>([]);
   const [socialMedia, setSocialMedia] = useState<SocialMedia>({});
   const [tempSocialMedia, setTempSocialMedia] = useState<SocialMedia>({});
   const [profileData, setProfileData] = useState<ProfileData>({});
@@ -113,6 +115,7 @@ const AdminDashboard = () => {
     loadLeads();
     loadStudents();
     loadUserRoles();
+    loadTestimonials();
   }, []);
 
   // Load localStorage data after authentication is confirmed
@@ -222,6 +225,90 @@ const AdminDashboard = () => {
       console.error('Error loading user roles:', error);
     }
   };
+
+  const loadTestimonials = async () => {
+    try {
+      // Load pending testimonials
+      const { data: pendingData, error: pendingError } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('is_approved', false)
+        .order('created_at', { ascending: false });
+
+      if (pendingError) {
+        console.error('Error loading pending testimonials:', pendingError);
+      } else {
+        setPendingTestimonials(pendingData || []);
+      }
+
+      // Load approved testimonials
+      const { data: approvedData, error: approvedError } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false });
+
+      if (approvedError) {
+        console.error('Error loading approved testimonials:', approvedError);
+      } else {
+        setApprovedTestimonials(approvedData || []);
+      }
+    } catch (error) {
+      console.error('Error loading testimonials:', error);
+    }
+  };
+
+  const approveTestimonial = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .update({ is_approved: true })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "הצלחה",
+        description: "הביקורת אושרה ותופיע באתר",
+      });
+
+      loadTestimonials();
+    } catch (error) {
+      console.error('Error approving testimonial:', error);
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן היה לאשר את הביקורת",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "הצלחה",
+        description: "הביקורת נמחקה",
+      });
+
+      loadTestimonials();
+    } catch (error) {
+      console.error('Error deleting testimonial:', error);
+      toast({
+        title: "שגיאה",
+        description: "לא ניתן היה למחוק את הביקורת",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const approveTestimonial = async (id: string) => {
 
   const loadStudents = async () => {
     try {
@@ -1006,31 +1093,114 @@ const AdminDashboard = () => {
                       ניהול ביקורות
                     </CardTitle>
                     <CardDescription>
-                      כל הביקורות שהתקבלו מהתלמידים
+                      ביקורות שממתינות לאישור וביקורות מאושרות
                     </CardDescription>
                   </div>
-                  {reviews.length > 0 && (
-                    <Button onClick={exportReviews} className="flex items-center gap-2">
-                      <Download className="w-4 h-4" />
-                      ייצא לאקסל
-                    </Button>
-                  )}
                 </div>
               </CardHeader>
               <CardContent>
-                {reviews.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    עדיין לא התקבלו ביקורות
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {reviews.map((review) => (
-                      <Card key={review.id} className="shadow-sm">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="font-semibold">{review.name}</h4>
+                <Tabs defaultValue="pending" className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="pending">ממתינות לאישור ({pendingTestimonials.length})</TabsTrigger>
+                    <TabsTrigger value="approved">מאושרות ({approvedTestimonials.length})</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="pending" className="space-y-4">
+                    {pendingTestimonials.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        אין ביקורות הממתינות לאישור
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {pendingTestimonials.map((testimonial) => (
+                          <Card key={testimonial.id} className="shadow-sm border-orange-200">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-semibold">{testimonial.name}</h4>
+                                    <div className="flex">
+                                      {Array.from({ length: testimonial.rating }, (_, i) => (
+                                        <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <p className="text-foreground leading-relaxed mb-2">{testimonial.comment}</p>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(testimonial.created_at).toLocaleDateString('he-IL')}
+                                  </span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => approveTestimonial(testimonial.id)}
+                                    className="bg-green-600 hover:bg-green-700"
+                                  >
+                                    <Check className="w-4 h-4 mr-2" />
+                                    אשר
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => deleteTestimonial(testimonial.id)}
+                                  >
+                                    <X className="w-4 h-4 mr-2" />
+                                    דחה
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="approved" className="space-y-4">
+                    {approvedTestimonials.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        אין ביקורות מאושרות
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {approvedTestimonials.map((testimonial) => (
+                          <Card key={testimonial.id} className="shadow-sm border-green-200">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h4 className="font-semibold">{testimonial.name}</h4>
+                                    <div className="flex">
+                                      {Array.from({ length: testimonial.rating }, (_, i) => (
+                                        <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                                      ))}
+                                    </div>
+                                    <Badge className="bg-green-100 text-green-800 border-green-300">מאושר</Badge>
+                                  </div>
+                                  <p className="text-foreground leading-relaxed mb-2">{testimonial.comment}</p>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(testimonial.created_at).toLocaleDateString('he-IL')}
+                                  </span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => deleteTestimonial(testimonial.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  מחק
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
                                 <div className="flex items-center gap-1">
                                   {renderStars(review.rating)}
                                 </div>
