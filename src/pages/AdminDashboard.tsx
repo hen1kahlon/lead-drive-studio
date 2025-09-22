@@ -61,10 +61,10 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!loading && !user) {
       navigate('/admin/login');
     }
-  }, [isAdmin, navigate]);
+  }, [loading, user, navigate]);
 
   useEffect(() => {
     // Load reviews and settings from localStorage
@@ -449,8 +449,15 @@ const AdminDashboard = () => {
     ));
   };
 
-  if (!isAdmin) {
-    return null;
+  if (loading || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-[80vh]">
+          <div className="text-center">טוען דשבורד...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
